@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mirari 照见 · 原型</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--paper:#f4f5f2;--paper2:#e9ece8;--card:#fbfbf9;--ink:#1b2321;--ink2:#56615d;--ink3:#8b9692;--line:rgba(27,35,33,.12);--mist:#a9bcbf;--accent:#5f7f93;
+--serif:ui-serif,'New York','Iowan Old Style',Georgia,'Songti SC',serif;--cn:-apple-system,BlinkMacSystemFont,'SF Pro Display','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC','Hiragino Sans GB','Helvetica Neue','Microsoft YaHei',sans-serif}
+html,body{height:100%}
+body{font-family:var(--sans);color:var(--ink);font-weight:400;-webkit-font-smoothing:antialiased;
+background:radial-gradient(1100px 700px at 15% 8%,#f1f4f3,transparent 60%),radial-gradient(900px 600px at 92% 92%,#dfe6ea,transparent 60%),#e8ebe9}
+button{font:inherit;color:inherit;cursor:pointer}
+.stage{min-height:100%;display:flex;align-items:center;justify-content:center;gap:clamp(56px,9vw,160px);padding:32px clamp(32px,4vw,64px);max-width:1200px;margin:0 auto;box-sizing:border-box}
+.phone{width:390px;height:min(844px,calc(100vh - 64px));background:var(--paper);border-radius:44px;position:relative;overflow:hidden;display:flex;flex-direction:column;
+box-shadow:0 0 0 10px #f9faf8,0 0 0 11px rgba(0,0,0,.06),0 50px 90px -30px rgba(30,45,50,.4)}
+@media (max-width:520px){.stage{padding:0}.phone{width:100%;height:100vh;height:100dvh;border-radius:0;box-shadow:none}}
+.side{flex:0 1 380px;max-width:380px}
+@media (max-width:840px){.side{display:none}}
+.side h1{font-family:var(--serif);font-weight:500;font-size:clamp(52px,5vw,72px);letter-spacing:.01em;line-height:1;margin:14px 0 6px}
+.etym{font-size:12px;color:var(--ink3);line-height:1.6;margin-top:10px}.etym i{font-family:var(--serif)}
+.side h1 span{display:block;font-family:var(--cn);font-weight:500;font-size:17px;letter-spacing:.5em;color:var(--ink3);margin-top:10px}
+.side .slogan{font-family:var(--cn);font-size:15px;color:var(--ink2);margin:18px 0 26px}
+.side ol{list-style:none;border-top:1px solid var(--line)}
+.side li{display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink2)}
+.side li span{flex:none;width:62px;font-size:10.5px;font-weight:600;letter-spacing:.12em;color:var(--ink3);padding-top:2px}
+.side .fine{margin-top:20px}
+
+.top{display:flex;align-items:center;justify-content:space-between;padding:24px 22px 8px}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;text-align:left}
+.brand b{font-family:var(--serif);font-weight:500;font-size:20px;letter-spacing:.01em;display:block;line-height:1.1}
+.brand small{font-size:9.5px;letter-spacing:.22em;color:var(--ink3);display:block;margin-top:2px}
+.ai-pill{font-size:10.5px;letter-spacing:.06em;color:var(--ink3);border:1px solid var(--line);border-radius:20px;padding:4px 9px}
+.ai-pill.on{color:var(--accent);border-color:rgba(95,127,147,.4)}
+main{flex:1;overflow-y:auto;padding:6px 22px 34px;scrollbar-width:none}
+main::-webkit-scrollbar{display:none}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);background:rgba(244,245,242,.94);backdrop-filter:blur(12px);padding:6px 10px calc(12px + env(safe-area-inset-bottom))}
+.tab{background:none;border:0;color:var(--ink3);display:flex;flex-direction:column;align-items:center;gap:1px;padding:12px 0 8px;position:relative}
+.tab .g{font-family:var(--cn);font-weight:500;font-size:18px;line-height:1.3}
+.tab .e{font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase}
+.tab.on{color:var(--ink)}
+.tab.on::before{content:'';position:absolute;top:-7px;width:18px;height:1.5px;background:var(--ink)}
+
+.eyebrow{font-family:var(--sans);font-size:10px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3)}
+.h{font-family:var(--cn);font-weight:600;font-size:23px;letter-spacing:.04em;line-height:1.35;margin:6px 0 8px}
+.lede{font-size:13.5px;line-height:1.75;color:var(--ink2);font-weight:300}
+.lede.sm{font-size:12.5px}
+.fine{font-size:11px;line-height:1.6;color:var(--ink3);margin-top:14px}
+.sec{font-family:var(--cn);font-weight:600;font-size:15px;margin:32px 0 12px;display:flex;align-items:baseline;gap:10px;letter-spacing:.04em}
+.sec em{font-family:var(--serif);font-style:italic;font-weight:400;font-size:12px;color:var(--ink3);letter-spacing:.04em}
+.empty{font-size:12.5px;color:var(--ink3);line-height:1.7;border:1px dashed var(--line);border-radius:14px;padding:16px}
+.empty a{color:var(--ink);text-decoration:underline;cursor:pointer}
+.btn{background:var(--ink);color:var(--paper);border:1px solid var(--ink);border-radius:999px;padding:11px 18px;font-size:13px;letter-spacing:.04em}
+.btn.ghost{background:transparent;color:var(--ink);border-color:rgba(27,35,33,.25)}
+.btn.sm{padding:8px 14px;font-size:12px}
+.btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ai{width:100%;margin-top:14px;background:linear-gradient(100deg,#5f7f93,#8aa3a6);border:0;color:#fff}
+.actions{display:flex;flex-direction:column;gap:10px;margin-top:28px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+/* home */
+.hero{padding:22px 0 8px}
+.q1{font-family:var(--serif);font-style:italic;font-size:21px;position:relative;display:inline-block;margin-top:18px;animation:fade .9s 1.7s forwards}
+.q1::after{content:'';position:absolute;left:-2px;top:56%;height:1.2px;background:var(--ink);width:0;animation:strike .8s .8s forwards}
+.q2{font-family:var(--serif);font-weight:600;font-size:27px;line-height:1.2;margin:4px 0 18px;opacity:0;transform:translateY(8px);animation:rise 1s 2.1s forwards}
+.still .q1{animation:none;opacity:.32}.still .q1::after{animation:none;width:calc(100% + 4px)}.still .q2{animation:none;opacity:1;transform:none}
+@keyframes strike{to{width:calc(100% + 4px)}}@keyframes fade{to{opacity:.32}}@keyframes rise{to{opacity:1;transform:none}}
+.daily{display:grid;grid-template-columns:96px 1fr;gap:16px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;margin-top:22px}
+.daily-field{height:124px;border-radius:10px;overflow:hidden}
+.daily .t{font-family:var(--cn);font-weight:600;font-size:15px;margin-top:8px;line-height:1.4}
+.daily .m{font-family:var(--serif);font-style:italic;font-size:12px;color:var(--ink2)}
+.daily .cta{font-size:12px;margin-top:14px;color:var(--accent)}
+.note{font-family:var(--cn);font-size:12px;color:var(--ink3);text-align:center;margin-top:10px}
+.promise{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.promise div{border-top:1.5px solid var(--ink);padding-top:10px}
+.promise b{font-family:var(--cn);font-weight:600;font-size:14px;display:block}
+.promise span{font-size:11px;line-height:1.55;color:var(--ink2);display:block;margin-top:4px}
+.archive{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat b{font-family:var(--serif);font-size:26px;font-weight:500;line-height:1}
+.stat span{display:block;font-size:11.5px;color:var(--ink2);margin-top:4px}
+.mycolors{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.mycolors i{width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.looks{display:flex;flex-direction:column;gap:8px}
+.look{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center}
+.strip{display:flex;height:34px;border-radius:6px;overflow:hidden}.strip i{flex:1}
+.look b{font-size:13px;font-weight:500;display:block}.look span{font-size:11px;color:var(--ink3)}
+.journey{list-style:none}
+.journey li{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.journey li>span{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--ink3);width:26px}
+.journey b{font-size:13.5px;font-weight:500;display:block}.journey em{font-style:normal;font-size:11.5px;color:var(--ink3)}
+
+/* color fields */
+.mv{display:block;width:100%;height:100%;object-fit:cover}
+.mv{object-position:50% 38%}
+.art-hero .mv{object-fit:contain;background:#ecefeb}
+.field{display:flex;flex-direction:column;width:100%;height:100%;filter:blur(8px) saturate(1.05);transform:scale(1.25)}
+.field i{display:block}
+
+.today{padding-top:6px}
+.today-h{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.today-h .h{margin-bottom:0}
+.wpill{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 11px;font-size:11.5px;white-space:nowrap;margin-bottom:4px}
+.chips.scene button{display:flex;flex-direction:column;align-items:center;padding:6px 10px;flex:none;border-radius:14px;line-height:1.25}
+.chips.scene .addscene{min-width:38px;justify-content:center;font-size:18px;font-weight:300;color:var(--ink2);border-style:dashed}
+.chips.scene small{font-size:8.5px;color:var(--ink3);letter-spacing:.04em}
+.chips.scene button.on small{color:rgba(255,255,255,.65)}
+.rule{font-size:11.5px;color:var(--ink2);margin:12px 0 10px}
+.carousel{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -22px;padding:2px 22px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.carousel::-webkit-scrollbar{display:none}
+.lcard{flex:0 0 86%;scroll-snap-align:center;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 14px 28px -22px rgba(0,0,0,.35)}
+.lc-top{display:flex;justify-content:space-between;align-items:baseline}
+.lc-top b{font-size:15px;font-weight:600}.lc-top span{font-family:var(--serif);font-style:italic;font-size:12px;color:var(--ink3)}
+.lc-flat{background:linear-gradient(180deg,#eceeeb,#e4e7e3);border-radius:14px;padding:8px 6px 4px;margin-top:10px;position:relative}
+.lc-flat .own{position:absolute;top:8px;right:8px;font-size:10px;background:rgba(251,251,249,.9);border-radius:20px;padding:3px 8px;color:#3d6450}
+.why{font-size:12.5px;line-height:1.7;margin-top:10px}
+.wnote{font-size:11px;color:var(--accent);margin-top:4px}
+.lc-items{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.lc-items i{font-style:normal;font-size:10.5px;color:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:2px 8px 2px 4px;display:flex;align-items:center;gap:4px}
+.lc-items em{width:10px;height:10px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.lc-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px}
+.musechip{display:flex;align-items:center;gap:6px;background:none;border:0;font-size:11px;color:var(--ink2);text-align:left}
+.mf{width:22px;height:22px;border-radius:6px;overflow:hidden;flex:none;display:block}
+.sceneform{display:flex;gap:8px;margin-top:6px}
+.sceneform input{flex:1;min-width:0;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px;font:inherit;font-size:12.5px;color:var(--ink);outline:none}
+.sceneform input:focus{border-color:var(--ink)}
+.chips{display:flex;gap:6px;margin-top:16px;overflow-x:auto;scrollbar-width:none}
+.chips button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;font-size:12px;white-space:nowrap}
+.chips button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.kd{font-style:normal;font-size:9.5px;letter-spacing:.08em;color:var(--accent);display:block;margin-bottom:2px}
+.decode{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.decode>div{background:var(--card);padding:12px 14px;display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:start}
+.decode span{font-size:10.5px;color:var(--ink3);padding-top:2px}
+.decode i{font-style:normal;display:inline-block;font-size:11.5px;border:1px solid var(--line);border-radius:20px;padding:2px 8px;margin:0 4px 4px 0}
+.decode b{font-weight:500;font-size:13px;line-height:1.6}
+.decode .sty{font-family:var(--serif);font-style:italic;font-size:17px}
+/* gallery */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px;text-align:left}
+.card-field{height:150px;border-radius:10px;overflow:hidden;position:relative}
+.card-field.plus{display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(135deg,#eef0ed 0 8px,#e6e9e5 8px 16px)}
+.card-field.plus span{font-size:28px;color:var(--ink3);font-weight:300}
+.label{padding:10px 4px 4px}
+.label b{font-family:var(--cn);font-weight:600;font-size:13px;display:block;line-height:1.4}
+.label span{font-family:var(--serif);font-style:italic;font-size:11.5px;color:var(--ink2)}
+
+/* result */
+.back{background:none;border:0;font-size:12.5px;color:var(--ink2);padding:6px 0 12px}
+.art-hero,.art-img{height:220px;border-radius:16px;overflow:hidden;position:relative;background:var(--paper2)}
+.art-img img{width:100%;height:100%;object-fit:cover;display:block}
+.wall{margin:14px 0 4px;padding-left:12px;border-left:2px solid var(--ink)}
+.wall .t{font-family:var(--cn);font-weight:600;font-size:18px;line-height:1.4}
+.wall .m{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--ink2)}
+.badge{display:inline-block;font-size:10.5px;letter-spacing:.06em;color:var(--accent);border:1px solid rgba(95,127,147,.35);border-radius:20px;padding:2px 8px;margin-top:8px}
+.pal{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 8px;margin-top:16px}
+.pal i{display:block;height:34px;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.pal b{display:block;font-size:12px;font-weight:500;margin-top:5px}
+.pal span{font-size:10.5px;color:var(--ink3);font-family:ui-monospace,Menlo,monospace}
+.flat-wrap{background:linear-gradient(180deg,#eceeeb,#e4e7e3);border-radius:18px;padding:14px 10px 8px;position:relative}
+.flat{width:100%;display:block}
+.flat-wrap .tag{position:absolute;top:12px;right:12px;font-family:var(--cn);font-size:11px;background:rgba(251,251,249,.85);border-radius:20px;padding:4px 10px}
+.pieces{list-style:none;margin-top:12px}
+.pieces li{display:flex;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.pieces i{width:26px;height:26px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.pieces b{font-size:13px;font-weight:500;display:block}.pieces span{font-size:11px;color:var(--ink3)}
+.placard{background:var(--card);border:1px solid var(--line);padding:18px 18px 16px;margin-top:20px;box-shadow:0 1px 0 var(--line),0 12px 24px -18px rgba(0,0,0,.25)}
+.placard p:last-child{font-family:var(--cn);font-size:13.5px;line-height:1.95;margin-top:8px}
+.reading{margin-top:18px;display:grid;grid-template-columns:auto 1fr;gap:10px 14px}
+.reading dt{font-size:11px;color:var(--ink3);letter-spacing:.04em;white-space:nowrap;padding-top:1px}
+.reading dd{font-size:12.5px;line-height:1.7;color:var(--ink2)}
+.ask{margin-top:26px;text-align:center;padding:22px 12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.ask .qq{font-family:var(--cn);font-size:16px;line-height:1.7;margin:10px 0 6px}
+.ask .m{font-size:11.5px;color:var(--ink3)}
+.feel{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.feel button{border:1px solid rgba(27,35,33,.22);background:transparent;border-radius:999px;padding:8px 16px;font-size:12.5px}
+.feel button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.feel.big{margin-top:16px}.feel.big button{flex:1;padding:12px}
+.match{list-style:none}
+.match li{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.pair{position:relative;width:40px;height:28px}
+.pair i{position:absolute;width:26px;height:26px;border-radius:50%;box-shadow:0 0 0 2px var(--paper)}
+.pair i:last-child{left:14px}
+.pair i.none{background:repeating-linear-gradient(45deg,#e3e6e2 0 3px,#f4f5f2 3px 6px)}
+.match b{font-size:12.5px;font-weight:500;display:block}
+.match span{font-size:11px;color:var(--ink3)}
+.match .st{font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.st.own{background:#e3ece6;color:#3d6450}.st.near{background:#eeeadf;color:#7a6a3d}
+.st.gap{background:var(--ink);color:var(--paper);border:0}.st.gap.done{background:transparent;color:var(--ink3);border:1px solid var(--line)}
+
+.manifesto{border-left:2px solid var(--ink);padding:2px 0 2px 14px;margin:8px 0 14px}
+.manifesto p{font-size:13.5px;line-height:1.85;color:var(--ink2)}.manifesto b{color:var(--ink);font-weight:600}
+.fitwrap{position:relative;margin-top:12px;border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 24px 40px -26px rgba(0,0,0,.4)}
+.fitwrap canvas{display:block;width:100%;height:auto}.fitwrap.tapmode canvas{cursor:crosshair}
+.demo-tag{position:absolute;left:10px;top:10px;font-size:10px;background:rgba(251,251,249,.92);border-radius:20px;padding:3px 9px;color:var(--ink2)}
+.cmp{position:absolute;right:10px;bottom:10px;border:0;background:rgba(27,35,33,.78);color:#fff;border-radius:20px;padding:6px 12px;font-size:11px}
+.fithint{position:absolute;left:12px;right:12px;bottom:46px;text-align:center;font-size:11.5px;background:rgba(27,35,33,.82);color:#fff;border-radius:12px;padding:7px 10px;pointer-events:none}
+.markrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-size:11px;color:var(--ink3)}
+.markrow button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 11px;font-size:12px}
+.markrow button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}.markrow button.done{border-color:#8fb39b;color:#3d6450}
+.sl{display:grid;grid-template-columns:56px 34px 1fr 34px;align-items:center;gap:6px;margin-top:10px;font-size:12px}
+.sl small{font-size:10px;color:var(--ink3);text-align:center}.sl input{width:100%;accent-color:#1b2321}
+.pchips{display:flex;gap:6px;flex-wrap:wrap}
+.pchips button{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 11px 5px 6px;font-size:12px}
+.pchips i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.pchips button.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.adjname{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;font-size:13px}
+.adjname span{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--ink3)}
+.model{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:12px}
+.mrow{display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:center;margin-bottom:8px;font-size:12px}
+.mrow select{font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;background:var(--paper);color:var(--ink);width:100%}
+.bchips{display:flex;flex-wrap:wrap;gap:5px}
+.bchips button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 10px;font-size:11.5px}
+.bchips button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.model .sl{margin-top:2px}
+.swrow{margin-top:12px}.swrow p{font-size:12px;font-weight:500}.swrow em{font-style:normal;font-weight:400;color:var(--ink3);font-size:11px;margin-left:4px}
+.swrow a{font-size:11px;color:var(--accent);margin-left:6px;cursor:pointer;text-decoration:underline}
+.swrow div{display:flex;gap:8px;margin-top:8px}.swrow i{flex:1;height:30px;border-radius:8px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.celebs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.celebs a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--ink);text-decoration:none}
+.celebs b{display:block;font-size:12.5px;font-weight:500}.celebs span{font-size:10.5px;color:var(--accent)}
+.wph{aspect-ratio:1;border-radius:8px;background:#eceeeb;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.wph img{max-width:92%;max-height:92%;object-fit:contain;filter:drop-shadow(0 3px 4px rgba(0,0,0,.18))}
+.wph-btn{margin:4px 2px 2px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:2px 8px;font-size:10px;color:var(--ink2)}
+.addp{display:grid;grid-template-columns:110px 1fr;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px}
+.addp-img{background:#eceeeb;border-radius:10px;display:flex;align-items:center;justify-content:center;min-height:120px}.addp-img img{max-width:94%;max-height:140px;object-fit:contain}
+.addp .k{font-size:11.5px;color:var(--ink2);display:flex;align-items:center;gap:6px;margin-bottom:8px}.addp .k i{width:14px;height:14px;border-radius:50%;display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.addp input{margin-top:8px;width:100%;border:1px solid var(--line);border-radius:10px;padding:7px 10px;font:inherit;font-size:12.5px;background:var(--paper);color:var(--ink)}
+#modal{position:absolute;inset:0;pointer-events:none;z-index:6}
+#modal>*{pointer-events:auto}
+.dmask{position:absolute;inset:0;background:rgba(27,35,33,.35)}
+.dsheet{position:absolute;left:0;right:0;bottom:0;max-height:88%;overflow-y:auto;background:var(--paper);border-radius:24px 24px 0 0;padding:18px 20px 28px;box-shadow:0 -10px 30px rgba(0,0,0,.18)}
+.dsh{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}.dsh b{font-size:16px}.dsh em{font-style:normal;font-size:10px;color:var(--accent);border:1px solid rgba(79,111,131,.4);border-radius:20px;padding:1px 7px}.dsh span{font-size:11px;color:var(--ink3);flex:1}
+.dsh button{margin-left:auto;border:0;background:var(--paper2);width:30px;height:30px;border-radius:50%;font-size:18px;line-height:1}
+.dprev{background:linear-gradient(180deg,#eceeeb,#e4e7e3);border-radius:16px;min-height:200px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:8px}
+.dprev img{max-width:100%;max-height:300px;object-fit:contain;border-radius:10px}.dprev .flat{width:100%}
+.dlt{position:absolute;left:10px;top:10px;font-size:11px;background:rgba(251,251,249,.9);border-radius:20px;padding:3px 9px}
+.dempty{font-size:12px;color:var(--ink3)}
+.dpick{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.dpick button{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:8px 10px;font-size:12.5px;text-align:left}
+.dsheet textarea{width:100%;margin-top:12px;min-height:84px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:13px;line-height:1.6;background:var(--card);color:var(--ink);resize:vertical}
+.dhead{display:flex;align-items:center;gap:10px;margin-bottom:8px}.dhead b{font-size:13.5px;font-weight:600}.dhead span{font-size:11px;color:var(--ink3);flex:1}
+.dhead button{border:1px solid var(--line);background:var(--card);width:28px;height:28px;border-radius:50%;font-size:16px;line-height:1}
+.dweek,.dgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dweek span{font-size:10px;color:var(--ink3);text-align:center;padding:2px 0}
+.dcell{aspect-ratio:3/4;border-radius:8px;border:1px solid var(--line);background:var(--card);position:relative;overflow:hidden;padding:0}
+.dcell.blank{border:0;background:transparent}
+.dcell b{position:absolute;left:4px;top:3px;font-size:10px;font-weight:600;color:var(--ink2)}
+.dcell.has b{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.dcell.today{outline:1.5px solid var(--ink);outline-offset:1px}
+.dcell.future{opacity:.35;cursor:default}
+.dcell img{width:100%;height:100%;object-fit:cover}
+.dlook{display:grid;grid-template-columns:1fr 1fr;width:100%;height:100%}.dlook i{display:block}
+.dpick .dlook{width:28px;height:28px;border-radius:6px;overflow:hidden;flex:none}
+.dtext{display:flex;align-items:center;justify-content:center;height:100%;font-size:14px;color:var(--ink3)}
+.hsec{margin-top:38px}
+.hsec .h{margin:4px 0 12px}
+.hcard{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 14px 28px -22px rgba(0,0,0,.35)}
+.hcard.daily{display:grid;grid-template-columns:96px 1fr;gap:16px;margin:0}
+.hcard .daily-field{height:124px;border-radius:12px;overflow:hidden}
+.hcard .t{font-family:var(--cn);font-weight:600;font-size:15px;margin-top:6px;line-height:1.4}
+.hcard .dsub{font-size:11.5px;color:var(--ink3);line-height:1.6;margin-top:8px}
+.hcard.why{padding:18px 18px 20px}
+.hcard.why .q1{margin-top:0;font-size:19px}.hcard.why .q2{font-size:24px;margin:2px 0 10px}
+.hcard.why .lede{font-size:12.5px}
+.hcard .dhead{margin-bottom:8px}
+.cooldef,.coolrow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:11px;color:var(--ink3)}
+.cooldef{margin:8px 0 4px}.coolrow{margin-top:12px}
+.cooldef span,.coolrow span{margin-right:2px}
+.cooldef button,.coolrow button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:3px 9px;font-size:11px;color:var(--ink2)}
+.cooldef button.on,.coolrow button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.endbtn{margin-top:10px;width:100%;border:1px dashed #8fb39b;background:#eef4f0;color:#3d6450;border-radius:12px;padding:8px;font-size:12px}
+.endbox{margin-top:10px;background:#eef4f0;border-radius:12px;padding:10px 12px}.endbox p{font-size:12px;line-height:1.6;color:var(--ink)}.endbox .row{margin-top:8px}
+.friends{display:flex;gap:10px;flex-wrap:wrap}
+.fr{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--ink2);background:none;border:0;padding:0}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-style:normal;font-size:14px;font-weight:600;flex:none}
+.fr.add .av{background:transparent;border:1px dashed var(--ink3);color:var(--ink2);font-weight:300;font-size:18px}
+.inv{margin-top:12px;background:var(--paper2);border-radius:12px;padding:10px 12px}.inv p{font-size:12px;color:var(--ink2)}.inv code{display:block;font-size:11px;margin-top:6px;word-break:break-all;color:var(--ink)}
+.rules{list-style:none;margin-top:12px;border-top:1px solid var(--line);padding-top:8px}.rules li{font-size:11.5px;color:var(--ink2);padding:3px 0 3px 14px;position:relative}.rules li::before{content:'';position:absolute;left:0;top:10px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.post{margin-bottom:12px}.ph{display:flex;align-items:center;gap:8px}.ph .av{width:30px;height:30px;font-size:12px}.ph b{font-size:13px}.ph span{font-size:11px;color:var(--ink3)}
+.pflat{background:linear-gradient(180deg,#eceeeb,#e4e7e3);border-radius:14px;margin-top:10px;padding:6px}.pimg{margin-top:10px;border-radius:14px;overflow:hidden}.pimg img{width:100%;display:block}
+.pst{font-size:13px;line-height:1.7;margin-top:10px}.at{color:var(--accent);font-weight:600}
+.react{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.react button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:4px 10px;font-size:11.5px;color:var(--ink2)}.react button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.rnote{font-size:10.5px;color:var(--ink3);margin-top:6px}
+.cmt{font-size:12px;line-height:1.6;margin-top:6px;color:var(--ink2)}.cmt b{color:var(--ink);margin-right:6px}
+.cform{display:flex;gap:6px;margin-top:10px}.cform input{flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font:inherit;font-size:12px;background:var(--paper);color:var(--ink)}
+.msgs{display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto}
+.msg{display:flex;gap:8px;align-items:flex-start}.msg .av{width:28px;height:28px;font-size:11px}.msg b{font-size:10.5px;color:var(--ink3);display:block;margin-bottom:2px}
+.msg p{font-size:12.5px;line-height:1.55;background:var(--paper2);border-radius:4px 14px 14px 14px;padding:7px 11px;display:inline-block}
+.msg.me{justify-content:flex-end}.msg.me p{background:var(--ink);color:var(--paper);border-radius:14px 4px 14px 14px}
+.mlook{width:180px;background:linear-gradient(180deg,#eceeeb,#e4e7e3);border-radius:12px;padding:4px;position:relative}.mlook span{position:absolute;left:8px;top:6px;font-size:10px;background:rgba(251,251,249,.9);border-radius:10px;padding:1px 6px}
+.tagrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px;font-size:11px;color:var(--ink3)}
+.tagrow button{display:flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:3px 9px 3px 3px;font-size:11.5px}.tagrow i{width:18px;height:18px;border-radius:50%;color:#fff;font-style:normal;font-size:10px;display:flex;align-items:center;justify-content:center}
+.tagrow button.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.sharetog{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2);margin-top:10px}
+/* drape */
+.sets{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:16px}
+.subs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.subs button{background:transparent;border:1px solid var(--line);border-radius:10px;padding:6px 0;display:flex;flex-direction:column;align-items:center}
+.subs b{font-size:12.5px;font-weight:500}.subs span{font-size:9px;color:var(--ink3);letter-spacing:.06em}
+.subs button.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.sets button{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 0;display:flex;flex-direction:column;align-items:center}
+.sets b{font-family:var(--cn);font-size:16px;font-weight:600}
+.sets span{font-size:9px;letter-spacing:.1em;color:var(--ink3)}
+.sets button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.sets button.on span{color:rgba(255,255,255,.6)}
+.setdesc{font-size:11.5px;color:var(--ink3);text-align:center;margin:10px 0 12px;font-family:var(--cn)}
+.mirror{position:relative;aspect-ratio:300/340;border-radius:170px 170px 20px 20px;overflow:hidden;background:#dfe2df;box-shadow:0 0 0 6px var(--card),0 0 0 7px var(--line),0 24px 40px -24px rgba(0,0,0,.35);margin:0 8px}
+.mirror canvas,.mirror .ph{position:absolute;inset:0;width:100%;height:100%;display:block}
+.mirror.tapmode canvas{cursor:crosshair}
+.drapesvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transition:all .3s}
+.drapesvg path{transition:fill .35s}
+.swname{position:absolute;left:0;right:0;bottom:16px;text-align:center;pointer-events:none}
+.swname b{font-family:var(--cn);font-size:15px;font-weight:600;display:block}
+.swname span{font-size:10.5px;font-family:ui-monospace,Menlo,monospace;opacity:.75}
+.nav{position:absolute;top:44%;width:34px;height:34px;border-radius:50%;border:0;background:rgba(251,251,249,.7);font-size:20px;line-height:1;color:var(--ink)}
+.nav.l{left:10px}.nav.r{right:10px}
+.tiphint{position:absolute;top:18px;left:0;right:0;text-align:center;font-size:11px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);pointer-events:none}
+.dots{display:flex;justify-content:center;gap:8px;margin-top:18px}
+.dots i{width:14px;height:14px;border-radius:50%;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);position:relative}
+.dots i.cur{outline:1.5px solid var(--ink);outline-offset:2px}
+.dots i.y::after{content:'♡';position:absolute;top:-14px;left:2px;font-size:10px;color:var(--ink)}
+.dots i.n{opacity:.35}
+.under{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.under b{font-family:var(--cn);font-size:13.5px;display:block}
+.under span{font-size:11.5px;color:var(--ink2);line-height:1.6;display:block;margin-top:4px}
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar{display:grid;grid-template-columns:44px 1fr 22px;gap:10px;align-items:center;font-size:12px}
+.bar b{font-family:var(--cn);font-weight:600}
+.bar div{height:8px;background:var(--paper2);border-radius:4px;overflow:hidden}
+.bar div i{display:block;height:100%;background:var(--ink)}
+.bar span{color:var(--ink3);text-align:right}
+.verdict{font-size:12.5px;line-height:1.8;color:var(--ink2);margin-top:14px;font-family:var(--cn)}
+.liked{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.liked i{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+
+/* closet */
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--paper2);border-radius:999px;padding:3px;margin:14px 0 16px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:8px;font-size:12.5px;color:var(--ink2)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.wgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.witem{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px}
+.witem svg{display:block;width:100%;border-radius:8px;background:#eceeeb}
+.witem b{font-size:11.5px;font-weight:500;display:block;margin:6px 2px 0;line-height:1.35}
+.witem span{font-size:10px;color:var(--ink3);display:block;margin:2px 2px 2px}
+.nudge{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:12.5px;line-height:1.7;color:var(--ink2);margin-bottom:14px}
+.nudge b{color:var(--ink);font-weight:500}
+.markets{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}
+.markets button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 11px;font-size:11.5px;white-space:nowrap}
+.markets button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.wcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px;position:relative}
+.wtop{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center}
+.wtop i{width:34px;height:34px;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.wtop b{font-size:13px;font-weight:500;display:block}
+.wtop span{font-size:11px;color:var(--ink3)}
+.price{text-align:right}.price b{font-family:var(--serif);font-size:18px;font-weight:600}
+.ok{font-style:normal;color:#3d6450}
+.spark{display:block;width:100%;margin:10px 0 4px}
+.wmeta{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink3)}
+.tgt{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px;font-size:11.5px;color:var(--ink2)}
+.tgt button{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:transparent;font-size:15px}
+.reflect{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.reflect span{font-size:10.5px;background:var(--paper2);border-radius:20px;padding:3px 9px;color:var(--ink2)}
+.reflect .cool{background:#efe9dc;color:#7a6a3d}.reflect .cool.done{background:#e3ece6;color:#3d6450}
+.rm{position:absolute;top:-8px;right:10px;background:var(--paper);border:1px solid var(--line);border-radius:20px;font-size:10px;padding:2px 8px;color:var(--ink3)}
+
+#toast{position:absolute;left:50%;bottom:92px;transform:translate(-50%,20px);background:var(--ink);color:var(--paper);font-size:12.5px;padding:10px 16px;border-radius:999px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:5}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="stage">
+  <aside class="side">
+    <svg width="46" height="46" viewBox="0 0 44 44" aria-hidden="true"><path d="M11 40V19a11 11 0 0 1 22 0v21z" fill="none" stroke="#1b2321" stroke-width="1.6"/><path d="M15 38V20a7 7 0 0 1 7-7" fill="none" stroke="#8b9692" stroke-width=".9"/><path d="M24 23l5-5M24 29l7-7" stroke="#8b9692" stroke-width="1" stroke-linecap="round"/><line x1="5" y1="40.5" x2="39" y2="40.5" stroke="#1b2321" stroke-width="1.2"/></svg>
+    <p class="eyebrow" style="margin-top:14px">Hackathon Prototype · AI × Going Global</p>
+    <h1>Mirari<span>照见</span></h1>
+    <p class="etym">mirari（拉丁语）：凝视、惊叹——也是 <i>mirror</i> 与 <i>miracle</i> 共同的词源。</p>
+    <p class="slogan">看见自己，成为自己。<br><span style="font-family:var(--serif);font-style:italic;color:var(--ink3)">See yourself. Become yourself.</span></p>
+    <ol>
+      <li><span>SELF</span>今天去哪：按场合与天气滑动整套搭配；穿搭日志记下每一天</li>
+      <li><span>COLOR</span>四季色彩试衣镜：按季型、身形与肤色生成模特，或上传全身照试穿</li>
+      <li><span>MUSE</span>灵感解码：画作 · 影视 · COS · 博主 → 单品 → 规律 → 风格</li>
+      <li><span>CLOSET</span>先穿已有的：拍照入库，缺口才蹲价，冷静期由你决定</li>
+      <li><span>CIRCLE</span>小圈子：只和邀请的朋友分享，没有点赞数与粉丝数</li>
+    </ol>
+    <p class="fine">原型 v0.3 · 衣橱、价格与小圈子为演示数据 · 影视、COS 与趋势配图为原创插画 · 照片仅在本机处理</p>
+  </aside>
+  <div class="phone">
+    <header class="top">
+      <button class="brand" data-a="tab" data-t="home">
+        <svg width="30" height="30" viewBox="0 0 44 44" aria-hidden="true"><path d="M11 40V19a11 11 0 0 1 22 0v21z" fill="none" stroke="#1b2321" stroke-width="1.6"/><path d="M15 38V20a7 7 0 0 1 7-7" fill="none" stroke="#8b9692" stroke-width=".9"/><path d="M24 23l5-5M24 29l7-7" stroke="#8b9692" stroke-width="1" stroke-linecap="round"/><line x1="5" y1="40.5" x2="39" y2="40.5" stroke="#1b2321" stroke-width="1.2"/></svg>
+        <span><b>Mirari</b><small>照见 · SEE YOURSELF</small></span>
+      </button>
+      <span class="ai-pill" id="aiPill">本机模式</span>
+    </header>
+    <main id="main"></main>
+    <nav class="tabs">
+      <button class="tab" data-a="tab" data-t="home"><span class="e">Self</span></button>
+      <button class="tab" data-a="tab" data-t="drape"><span class="e">Color</span></button>
+      <button class="tab" data-a="tab" data-t="art"><span class="e">Muse</span></button>
+      <button class="tab" data-a="tab" data-t="closet"><span class="e">Closet</span></button>
+      <button class="tab" data-a="tab" data-t="circle"><span class="e">Circle</span></button>
+    </nav>
+    <div id="modal"></div>
+    <div id="toast"></div>
+  </div>
+</div>
+<input type="file" id="fileArt" accept="image/*" hidden>
+<input type="file" id="filePhoto" accept="image/*" hidden>
+<input type="file" id="fileBody" accept="image/*" hidden>
+<input type="file" id="fileGarment" accept="image/*" hidden>
+<input type="file" id="fileDiary" accept="image/*" hidden>
+<script>
+/* ---------- utils ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function hexToRgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255]}
+function rgbToHex(r,g,b){return'#'+[r,g,b].map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('')}
+function rgbToHsl(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let h=0,s=0;const l=(mx+mn)/2;if(mx!==mn){const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);if(mx===r)h=(g-b)/d+(g<b?6:0);else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60}return[h,s,l]}
+function rgbToLab(r,g,b){const[R,G,B]=[r,g,b].map(v=>{v/=255;return v>.04045?Math.pow((v+.055)/1.055,2.4):v/12.92});let x=(R*.4124+G*.3576+B*.1805)/.95047,y=R*.2126+G*.7152+B*.0722,z=(R*.0193+G*.1192+B*.9505)/1.08883;const f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116;x=f(x);y=f(y);z=f(z);return[116*y-16,500*(x-y),200*(y-z)]}
+const hsl=h=>rgbToHsl(...hexToRgb(h));
+function dE(a,b){const A=rgbToLab(...hexToRgb(a)),B=rgbToLab(...hexToRgb(b));return Math.hypot(A[0]-B[0],A[1]-B[1],A[2]-B[2])}
+const textOn=h=>hsl(h)[2]>.62?'#1b2321':'#fbfbf9';
+const isWarm=h=>{const[hu,s]=hsl(h);return s>.08&&(hu<75||hu>330)};
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function nameColor(hex){const[h,s,l]=hsl(hex);
+  if(s<.1||l>.94||l<.07){if(l>.9)return'云白';if(l>.78)return'雾白';if(l>.6)return'浅灰';if(l>.4)return'石灰';if(l>.18)return'炭灰';return'墨黑'}
+  const bins=[[15,'红'],[40,'赭'],[65,'黄'],[160,'绿'],[195,'青'],[255,'蓝'],[290,'紫'],[340,'粉'],[361,'红']];
+  let base=bins.find(b=>h<b[0])[1];if(base==='赭'&&l>.7)base='杏';
+  let pre=s<.28?(l>.7?'雾':(l<.32?'深灰':'灰')):(l>.76?'浅':(l<.3?'深':''));
+  if(!pre)pre={红:'朱',赭:'橙',杏:'暖',黄:'明',绿:'翠',青:'碧',蓝:'钴',紫:'堇',粉:'玫'}[base]||'';
+  return pre+base}
+const SLOT={outer:'外套',top:'上衣',bottom:'下装',shoes:'鞋履',accent:'点缀'};
+const FEEL={yes:'像我',some:'有一点',no:'不像我'};
+const KIND={painting:['画作','Painting'],film:['影视','Film & TV'],cos:['COS · 日常转译','Cosplay & Bounding'],trend:['穿搭博主 · 趋势','Creator & Trend'],upload:['你的图像','Your image']};
+
+/* ---------- data ---------- */
+const P=(hex,name)=>({hex,name});
+const PRESETS=[
+{kind:'painting',id:'monet',title:'睡莲',artist:'Claude Monet',year:'1906',
+ palette:[P('#6f8fa6','池塘蓝'),P('#9db7a5','水面灰绿'),P('#c9c3d9','薰衣草雾'),P('#e8e4d8','云白'),P('#3f5a57','深潭绿'),P('#d79aa6','莲粉')],
+ composition:'没有地平线、满幅平铺的视角，画面没有单一焦点 → 用同类色层层叠穿，而不是强对比，让视线在整体中流动。',
+ texture:'短促重叠的笔触、水汽般的模糊 → 水洗亚麻、真丝、雪纺这类有半透明感的面料。',
+ mood:'安静 · 流动 · 朦胧',principle:'同类色 · 低对比 · 一点粉',
+ label:'莫奈晚年反复画同一片池塘，他关心的不是莲花本身，而是光落在水面上的变化。这套搭配借用他的方法：用相近的蓝、绿、灰层层叠加，压低明度对比，只留下一抹莲粉作为视线的落点——就像画面里漂浮的那几朵花。',
+ question:'在这幅画里，最先吸引你的是颜色、光，还是那种看不清边界的感觉？',
+ pieces:[{slot:'outer',name:'灰绿风衣',hex:'#9db7a5',material:'水洗亚麻'},{slot:'top',name:'薰衣草雾衬衫',hex:'#c9c3d9',material:'真丝'},{slot:'bottom',name:'池塘蓝阔腿裤',hex:'#6f8fa6',material:'垂坠棉'},{slot:'shoes',name:'深潭绿乐福鞋',hex:'#3f5a57',material:'麂皮'},{slot:'accent',name:'莲粉小丝巾',hex:'#d79aa6',material:'真丝'}]},
+{kind:'painting',id:'vermeer',title:'戴珍珠耳环的少女',artist:'Johannes Vermeer',year:'c. 1665',
+ palette:[P('#141414','暗底黑'),P('#2e4a7d','青金石蓝'),P('#d9b45a','赭黄'),P('#1f2a44','深群青'),P('#f1e6cf','珍珠白'),P('#a5553a','赭红')],
+ composition:'人物侧身回望，光从左上方落下，视觉中心集中在脸与珍珠 → 把亮色与配饰集中在上半身、靠近脸部。',
+ texture:'光滑的釉面与柔和的明暗过渡 → 缎面、细针织、带柔光的皮革。',
+ mood:'静默 · 亲密 · 一瞬间的回眸',principle:'暗背景 · 蓝黄互补 · 一点高光',
+ label:'维米尔把人物放在近乎纯黑的背景前，让青金石蓝与赭黄这对互补色彼此照亮，再用一颗珍珠的高光收住整个画面。穿搭里，深色外套扮演"暗背景"，蓝与黄在领口附近相遇，唯一的珍珠就是那个高光——少即是多。',
+ question:'你更想成为画中那个回头的人，还是那个凝视她的人？',
+ pieces:[{slot:'outer',name:'深群青长外套',hex:'#1f2a44',material:'精纺羊毛'},{slot:'top',name:'赭黄细针织衫',hex:'#d9b45a',material:'羊绒针织'},{slot:'bottom',name:'黑色直筒裤',hex:'#141414',material:'精纺羊毛'},{slot:'shoes',name:'赭红玛丽珍鞋',hex:'#a5553a',material:'皮革'},{slot:'accent',name:'单只珍珠耳饰',hex:'#f1e6cf',material:'淡水珍珠'}]},
+{kind:'painting',id:'hokusai',title:'神奈川冲浪里',artist:'葛饰北斋',year:'c. 1831',
+ palette:[P('#1b3a5c','普鲁士蓝'),P('#e9e1cc','和纸米白'),P('#2f6690','浪蓝'),P('#a9b8c2','浪沫灰蓝'),P('#c7b28a','天际米黄'),P('#3b2e2a','船木褐')],
+ composition:'巨浪占据画面，远处的富士山很小却稳稳居中 → 宽大的廓形，配一个小而精确的细节。',
+ texture:'木版印刷的平涂与清晰轮廓 → 丹宁、府绸等平整挺括的面料。',
+ mood:'张力 · 敬畏 · 动中有静',principle:'蓝白对比 · 曲线对直线',
+ label:'北斋用了一种当时刚从欧洲传入的合成颜料——普鲁士蓝——画出巨浪，又让远处小小的富士山稳住整个构图：巨大的曲线与静止的三角形形成张力。这套搭配用靛蓝丹宁对应浪的力量，米白衬衫是浪沫与天空，褶裥的线条则是浪的弧度。',
+ question:'你被吸引的，是浪的力量，还是远处那座安静的山？',
+ pieces:[{slot:'outer',name:'普鲁士蓝工装夹克',hex:'#1b3a5c',material:'靛染丹宁'},{slot:'top',name:'米白府绸衬衫',hex:'#e9e1cc',material:'府绸棉'},{slot:'bottom',name:'浪蓝褶裥阔腿裤',hex:'#2f6690',material:'棉质斜纹'},{slot:'shoes',name:'船木褐德比鞋',hex:'#3b2e2a',material:'哑光皮革'},{slot:'accent',name:'灰蓝方巾',hex:'#a9b8c2',material:'棉麻'}]},
+{kind:'painting',id:'hammershoi',title:'背对的年轻女子',artist:'Vilhelm Hammershøi',year:'1904',
+ palette:[P('#8a8b86','灰墙'),P('#c9c7bf','晨光灰白'),P('#2b2b2b','衣裙黑'),P('#5d5a53','门框暖灰'),P('#e6e3dc','窗光白'),P('#a39a8a','地板灰棕')],
+ composition:'背影、门框与窗形成一层层几何框架 → 长线条、简洁的垂直廓形。',
+ texture:'薄涂、哑光、充满空气感 → 羊毛、羊绒、麂皮等哑光材质。',
+ mood:'静谧 · 克制 · 清冷',principle:'无彩色 · 明度阶梯',
+ label:'哈默修伊几乎只用灰色作画，却能画出十几种不同温度的灰。他画一个背对观者的女人——她不需要被看见，房间与光才是主角。这套搭配完全放弃彩色，只靠明度的阶梯和材质的差别制造层次：羊毛的哑光、羊绒的柔软、麂皮的温度。',
+ question:'一个背对着你的人，是否反而让你更想了解她？',
+ pieces:[{slot:'outer',name:'暖灰羊毛长大衣',hex:'#5d5a53',material:'精纺羊毛'},{slot:'top',name:'窗光白羊绒衫',hex:'#e6e3dc',material:'羊绒针织'},{slot:'bottom',name:'黑色长半裙',hex:'#2b2b2b',material:'羊毛呢'},{slot:'shoes',name:'灰棕麂皮短靴',hex:'#a39a8a',material:'麂皮'},{slot:'accent',name:'灰白发夹',hex:'#c9c7bf',material:'哑光金属'}]},
+{kind:'painting',id:'klimt',title:'吻',artist:'Gustav Klimt',year:'1907–08',
+ palette:[P('#c9a13b','金箔'),P('#8c6a1f','暗金'),P('#2f3a2a','草地墨绿'),P('#d8c9a3','奶金'),P('#e9dfc8','象牙'),P('#7a3b2e','赭红')],
+ composition:'两个人物被包裹成一个整体，几乎没有空间深度 → 一件强装饰单品，配上平整的素色单品。',
+ texture:'金箔与马赛克般的纹样 → 提花、织锦、丝绒。',
+ mood:'华丽 · 亲密 · 永恒',principle:'金色 · 纹样的对话',
+ label:'克里姆特在画中使用真正的金箔，并让两种纹样相遇：男性衣袍上是方形与直线，女性身上是圆形与花朵。这套搭配把这场"纹样的对话"带到身上：一件提花外套承担全部装饰，其余单品保持素净，让金色成为唯一的主角。',
+ question:'你喜欢被装饰包裹的感觉，还是更喜欢留白？',
+ pieces:[{slot:'outer',name:'暗金提花短外套',hex:'#8c6a1f',material:'提花织锦'},{slot:'top',name:'象牙真丝上衣',hex:'#e9dfc8',material:'真丝缎面'},{slot:'bottom',name:'墨绿丝绒长裤',hex:'#2f3a2a',material:'丝绒'},{slot:'shoes',name:'赭红尖头鞋',hex:'#7a3b2e',material:'皮革'},{slot:'accent',name:'金色几何耳饰',hex:'#c9a13b',material:'金属'}]},
+{kind:'painting',id:'vangogh',title:'杏花',artist:'Vincent van Gogh',year:'1890',
+ palette:[P('#5f9ea8','青蓝天'),P('#8fc1c4','浅湖蓝'),P('#f2efe6','花白'),P('#6b4f3a','枝干褐'),P('#b8cfa8','嫩芽绿'),P('#e4b9b6','花芯粉')],
+ composition:'枝条从画面一角伸展，背景是一整片平涂的蓝 → 一个颜色打底，细节分散点缀。',
+ texture:'清晰的轮廓线与厚涂的花瓣 → 刺绣、府绸、细棉。',
+ mood:'新生 · 明亮 · 温柔',principle:'蓝底 · 白色点缀',
+ label:'梵高为刚出生的侄子画了这幅杏花——它是一份关于新生的礼物。受日本浮世绘影响，他用清晰的轮廓和平涂的天空，让枝条浮在画面之上。这套搭配用大面积的湖蓝打底，把白与粉留给小面积的细节，就像花开在枝头。',
+ question:'如果要为一个新的开始穿一套衣服，你会选什么颜色？',
+ pieces:[{slot:'outer',name:'浅湖蓝衬衫夹克',hex:'#8fc1c4',material:'棉质斜纹'},{slot:'top',name:'花白刺绣上衣',hex:'#f2efe6',material:'刺绣细棉'},{slot:'bottom',name:'青蓝半身裙',hex:'#5f9ea8',material:'府绸棉'},{slot:'shoes',name:'枝干褐乐福鞋',hex:'#6b4f3a',material:'皮革'},{slot:'accent',name:'花芯粉小包',hex:'#e4b9b6',material:'软皮'}]}
+
+,{kind:'film',id:'mood',title:'花样年华',artist:'王家卫 Wong Kar-wai',year:'2000',
+ palette:[P('#2f4a3a','墨绿墙'),P('#1a1714','夜色黑'),P('#7a1f1f','旗袍暗红'),P('#c9a46a','昏黄灯光'),P('#8a6f5a','旧木褐'),P('#d8c3a0','米黄')],
+ composition:'人物常被门框、窗格与镜子"框"在画面一角 → 修身、高领、线条被收住的廓形。',
+ texture:'丝绸旗袍的花纹与雨夜的湿润光泽 → 真丝、提花、细小的刺绣。',
+ mood:'克制 · 暧昧 · 怀旧',principle:'框中框 · 浓色克制',
+ label:'王家卫很少让人物完整地出现在画面里——他们藏在门框、窗格与镜子之后，情感也被框住。这套搭配学习这种"克制"：让一件高领的暗红单品承担全部情绪，其余颜色都退到墨绿与昏黄里，像走廊的墙和灯。',
+ question:'你被吸引的是那些衣服，还是那种"说不出口"的情绪？',
+ pieces:[{slot:'outer',name:'墨绿长开衫',hex:'#2f4a3a',material:'羊绒针织'},{slot:'top',name:'暗红高领真丝衬衫',hex:'#7a1f1f',material:'真丝缎面'},{slot:'bottom',name:'夜色黑铅笔裙',hex:'#1a1714',material:'精纺羊毛'},{slot:'shoes',name:'旧木褐低跟鞋',hex:'#8a6f5a',material:'皮革'},{slot:'accent',name:'昏黄提花手包',hex:'#c9a46a',material:'提花织锦'}]},
+{kind:'film',id:'her',title:'她 Her',artist:'Spike Jonze',year:'2013',
+ palette:[P('#f1e4d3','奶油白'),P('#d9533f','珊瑚红'),P('#c9b38c','卡其'),P('#e8a08a','蜜桃粉'),P('#7a8a8f','雾灰蓝'),P('#4a3b33','深棕')],
+ composition:'柔焦的城市与大面积留白，人物常常独处 → 简单的廓形，提高腰线。',
+ texture:'温暖的柔焦、低对比的光 → 细针织、棉、羊毛混纺。',
+ mood:'温柔 · 孤独 · 复古的未来',principle:'暖色主角 · 柔焦',
+ label:'这部电影里的近未来没有金属与霓虹，取而代之的是珊瑚红衬衫、高腰裤和柔和的光。这套搭配让一件珊瑚红担任主角，下装提高腰线，其余都是奶油与卡其——温度来自颜色，而不是装饰。',
+ question:'如果未来是温柔的，你希望它是什么颜色？',
+ pieces:[{slot:'outer',name:'卡其短夹克',hex:'#c9b38c',material:'棉质斜纹'},{slot:'top',name:'珊瑚红衬衫',hex:'#d9533f',material:'府绸棉'},{slot:'bottom',name:'奶油白高腰裤',hex:'#f1e4d3',material:'羊毛混纺'},{slot:'shoes',name:'深棕德比鞋',hex:'#4a3b33',material:'哑光皮革'},{slot:'accent',name:'雾灰蓝细框眼镜',hex:'#7a8a8f',material:'金属'}]},
+{kind:'film',id:'fire',title:'燃烧女子的肖像',artist:'Céline Sciamma',year:'2019',
+ palette:[P('#2f5d4e','绿裙'),P('#1f2a33','夜海蓝'),P('#d9cbb0','亚麻白'),P('#a3302a','红裙'),P('#6b5a48','礁石褐'),P('#e0a458','火光橙')],
+ composition:'画家与模特长时间互相凝视，镜头几乎静止 → 完整、不切割身体的长线条。',
+ texture:'粗粝的羊毛裙、海风与亚麻 → 粗纺羊毛、亚麻、厚实的天然材质。',
+ mood:'凝视 · 平等 · 炽热',principle:'互补色 · 互相凝视',
+ label:'这部电影讲的是画家与被画者之间的凝视——当被看的人开始回看，凝视就变得平等。两位主角一绿一红，是一对互补色，也像彼此的镜子。这套搭配用整片的绿作为主体，只在一处放进红色，像她们之间的那道目光。',
+ question:'当你被人看着的时候，你也在看着对方吗？',
+ pieces:[{slot:'outer',name:'礁石褐粗纺外套',hex:'#6b5a48',material:'粗纺羊毛'},{slot:'top',name:'亚麻白宽袖衬衫',hex:'#d9cbb0',material:'水洗亚麻'},{slot:'bottom',name:'绿色长裙',hex:'#2f5d4e',material:'羊毛呢'},{slot:'shoes',name:'夜海蓝短靴',hex:'#1f2a33',material:'哑光皮革'},{slot:'accent',name:'红色小丝巾',hex:'#a3302a',material:'真丝'}]},
+{kind:'trend',id:'siren',title:'Office Siren',artist:'TikTok · Instagram',year:'2024–25',
+ palette:[P('#2b2b2e','炭黑'),P('#6d6f73','西装灰'),P('#8c1c2b','酒红'),P('#efe9df','奶白'),P('#b9a68a','玳瑁'),P('#c0c0c0','银')],
+ decode:{items:['修身细针织衫','低腰铅笔裙','细框眼镜','猫跟尖头鞋','细腰带'],pattern:'收身上装 + 修长下装 + 一件"知性"配饰',style:'Office Siren'},
+ composition:'镜头常从下往上、贴身拍摄，强调线条 → 收身的上装与修长的下装。',
+ texture:'精纺、细针织与漆面的反光 → 挺括的羊毛、细羊绒、漆皮。',
+ mood:'利落 · 自信 · 戏剧感',principle:'收身 + 修长 + 一点知性',
+ label:'这个风格走红时，常被概括成"一种性感的办公室感"。拆开来看，它其实是一条很简单的规律：收身上装、修长下装，再加一副细框眼镜。规律本身可以借用；要不要"性感"，由你决定。',
+ question:'如果没有人在看，你还会这样穿吗？',
+ pieces:[{slot:'outer',name:'西装灰收腰西装',hex:'#6d6f73',material:'精纺羊毛'},{slot:'top',name:'酒红细针织衫',hex:'#8c1c2b',material:'羊绒针织'},{slot:'bottom',name:'炭黑铅笔裙',hex:'#2b2b2e',material:'精纺羊毛'},{slot:'shoes',name:'奶白猫跟鞋',hex:'#efe9df',material:'漆面皮革'},{slot:'accent',name:'玳瑁细框眼镜',hex:'#b9a68a',material:'板材'}]},
+{kind:'trend',id:'clean',title:'Clean Girl',artist:'TikTok · Instagram',year:'2022–25',
+ palette:[P('#f4efe6','奶白'),P('#d8cbb5','燕麦'),P('#a9bcd0','浅牛仔蓝'),P('#e7c9b5','裸粉'),P('#c9a24a','金'),P('#8a7a68','灰褐')],
+ decode:{items:['白色背心','直筒牛仔裤','金色小圈耳环','低发髻','芭蕾平底鞋'],pattern:'中性色基础款 + 一件小金属配饰 + 极简发型',style:'Clean Girl'},
+ composition:'自然光、近景、留白多的画面 → 少而干净的单品，没有视觉噪音。',
+ texture:'光泽皮肤、柔软棉质 → 罗纹针织、丹宁、细皮革。',
+ mood:'轻松 · 洁净 · 低调',principle:'基础款 + 一点光',
+ label:'这个风格被称作"毫不费力"的美，但它也因为默认了某一种肤色、发质和生活方式而受到批评。Mirari 不判断你够不够"干净"，只把它拆成一条可以借用的规律：基础款打底，只留一个发光的小细节。',
+ question:'"毫不费力"的样子，背后其实花了多少力气？',
+ pieces:[{slot:'outer',name:'燕麦衬衫外套',hex:'#d8cbb5',material:'棉质斜纹'},{slot:'top',name:'奶白罗纹背心',hex:'#f4efe6',material:'罗纹针织'},{slot:'bottom',name:'浅牛仔直筒裤',hex:'#a9bcd0',material:'丹宁'},{slot:'shoes',name:'裸粉芭蕾鞋',hex:'#e7c9b5',material:'皮革'},{slot:'accent',name:'金色小圈耳环',hex:'#c9a24a',material:'金属'}]},
+{kind:'trend',id:'scandi',title:'Scandinavian Minimalism',artist:'TikTok · Instagram',year:'ongoing',
+ palette:[P('#cfc6b8','燕麦'),P('#ecebe6','雾白'),P('#8d8f8c','石灰'),P('#1f1f1f','黑'),P('#6e6153','胡桃'),P('#a7b2b5','冷灰蓝')],
+ decode:{items:['超大羊毛大衣','粗针织毛衣','宽腿西裤','厚底乐福鞋','帆布托特包'],pattern:'宽松外层 + 同色系内搭 + 平底鞋',style:'Scandinavian Minimalism'},
+ composition:'街景中的大块中性色与宽松轮廓 → 大面积外层，内部层层同色。',
+ texture:'羊毛、粗针织与帆布的哑光 → 天然材质的厚度与温度。',
+ mood:'从容 · 实用 · 安静',principle:'同色系 · 宽松外层',
+ label:'这个风格的核心不是"贵"，而是"少"：用宽松外层与同色系内搭，减少每天要做的决定。它很容易和衣橱里已有的基础款结合，不必为了它重新买一整套。',
+ question:'少一点选择，会让你更自由，还是更无聊？',
+ pieces:[{slot:'outer',name:'燕麦超大羊毛大衣',hex:'#cfc6b8',material:'精纺羊毛'},{slot:'top',name:'雾白粗针织衫',hex:'#ecebe6',material:'羊绒针织'},{slot:'bottom',name:'石灰宽腿西裤',hex:'#8d8f8c',material:'羊毛呢'},{slot:'shoes',name:'黑色厚底乐福鞋',hex:'#1f1f1f',material:'皮革'},{slot:'accent',name:'胡桃色托特包',hex:'#6e6153',material:'帆布'}]}
+
+,{kind:'cos',id:'witch',title:'女巫',artist:'万圣节 Halloween · 原型角色',year:'archetype',
+ palette:[P('#1b1b1f','午夜黑'),P('#3d2b4f','暗紫'),P('#4b5d3a','苔藓绿'),P('#6b1f2a','莓果暗红'),P('#b07d2b','南瓜铜'),P('#e8e1d3','骨白')],
+ decode:{items:['尖顶帽','长斗篷','黑色长裙','条纹长袜','扫帚'],pattern:'用"轮廓"代替道具：斗篷 → 长款大衣，尖顶帽 → 宽檐帽',style:'Witchy Everyday'},
+ composition:'又长又直的竖向轮廓，几乎从头罩到脚 → 长大衣 + 长裙，拉出一条完整的竖线。',
+ texture:'厚重的呢料与天鹅绒 → 羊毛呢、丝绒、针织。',
+ mood:'神秘 · 自在 · 一点叛逆',principle:'保留轮廓 · 去掉道具',
+ label:'Cos 不一定要穿全套戏服。日常转译（bounding）的做法是：保留角色的颜色和轮廓，换掉道具。斗篷变成一件长大衣，尖顶帽变成宽檐帽——走在街上，只有懂的人会会心一笑。',
+ question:'你想扮演的这个角色，身上有哪一部分其实就是你？',
+ pieces:[{slot:'outer',name:'午夜黑长款大衣',hex:'#1b1b1f',material:'羊毛呢'},{slot:'top',name:'暗紫高领针织',hex:'#3d2b4f',material:'羊绒针织'},{slot:'bottom',name:'苔藓绿丝绒长裙',hex:'#4b5d3a',material:'丝绒'},{slot:'shoes',name:'莓果暗红短靴',hex:'#6b1f2a',material:'哑光皮革'},{slot:'accent',name:'南瓜铜宽檐帽',hex:'#b07d2b',material:'羊毛毡'}]},
+{kind:'cos',id:'vampire',title:'吸血鬼伯爵',artist:'Bram Stoker《德古拉》',year:'1897',
+ palette:[P('#0e0e10','夜黑'),P('#e9e4da','苍白'),P('#3a3a42','石墨'),P('#7a0f1f','血红'),P('#2a1a2e','暗紫'),P('#8c7a5b','古铜')],
+ decode:{items:['高领斗篷','红色内衬','褶边衬衫','领巾','古董胸针'],pattern:'黑色主体 + 一处藏起来的红 + 一件古董配饰',style:'Gothic Romance'},
+ composition:'大面积的黑，只在转身时露出红色内衬 → 黑色外层，把红色藏在领口。',
+ texture:'丝绸衬衫与厚呢斗篷的对比 → 真丝、精纺羊毛、漆皮。',
+ mood:'优雅 · 危险 · 浪漫',principle:'红藏在黑里',
+ label:'Cos 吸血鬼的关键不是尖牙，而是"红藏在黑里"——斗篷的红色内衬只在转身时出现。日常里，可以把这一抹红放在领口的丝巾上，再配一件苍白的褶边衬衫。',
+ question:'你更喜欢被一眼看穿，还是只在转身时露出一点自己？',
+ pieces:[{slot:'outer',name:'夜黑长大衣',hex:'#0e0e10',material:'精纺羊毛'},{slot:'top',name:'苍白褶边衬衫',hex:'#e9e4da',material:'真丝'},{slot:'bottom',name:'石墨直筒裤',hex:'#3a3a42',material:'精纺羊毛'},{slot:'shoes',name:'暗紫切尔西靴',hex:'#2a1a2e',material:'漆面皮革'},{slot:'accent',name:'血红领巾',hex:'#7a0f1f',material:'真丝'}]},
+{kind:'cos',id:'mahou',title:'魔法少女',artist:'动漫 Anime · 类型角色',year:'archetype',
+ palette:[P('#f7a8c4','樱粉'),P('#f4f2f0','白'),P('#8fd3f4','天蓝'),P('#b48ee0','薰衣草'),P('#ff5d8f','莓红'),P('#ffd166','星黄')],
+ decode:{items:['水手领','百褶短裙','大蝴蝶结','长手套','及膝靴'],pattern:'只保留领口、蝴蝶结、百褶三个识别点，饱和度降一档',style:'Anime Bounding'},
+ composition:'为了在画面里一眼被认出，由几个高饱和的"识别点"组成 → 挑出两三个识别点，其余简化。',
+ texture:'光滑、轻盈、带一点闪光 → 府绸、丹宁、漆皮、真丝。',
+ mood:'明亮 · 勇敢 · 少女感',principle:'识别点 · 降饱和',
+ label:'动漫角色的服装为了在画面里被一眼认出，往往由几个高饱和的"识别点"组成。日常转译的做法是挑出其中两三个——领口、蝴蝶结、百褶——再把颜色降一档饱和度，就能从漫展走进日常。',
+ question:'你喜欢这个角色，是喜欢她的样子，还是她代表的那种力量？',
+ pieces:[{slot:'outer',name:'天蓝短款牛仔夹克',hex:'#8fd3f4',material:'丹宁'},{slot:'top',name:'樱粉水手领衬衫',hex:'#f7a8c4',material:'府绸棉'},{slot:'bottom',name:'白色百褶裙',hex:'#f4f2f0',material:'棉'},{slot:'shoes',name:'薰衣草玛丽珍鞋',hex:'#b48ee0',material:'漆面皮革'},{slot:'accent',name:'莓红蝴蝶结发饰',hex:'#ff5d8f',material:'真丝'}]}
+];
+const WARDROBE=[
+{name:'燕麦羊毛大衣',hex:'#cbbfa8',slot:'outer',mat:'羊毛',price:1890,wears:41,last:12},
+{name:'牛仔外套',hex:'#3a5878',slot:'outer',mat:'丹宁',price:520,wears:63,last:5},
+{name:'墨绿开衫',hex:'#3f5246',slot:'outer',mat:'针织',price:460,wears:22,last:38},
+{name:'白衬衫',hex:'#f3f1ea',slot:'top',mat:'府绸',price:320,wears:88,last:2},
+{name:'雾蓝针织衫',hex:'#8ea3b5',slot:'top',mat:'针织',price:390,wears:34,last:9},
+{name:'薰衣草真丝吊带',hex:'#bfb6d3',slot:'top',mat:'丝',price:420,wears:6,last:96},
+{name:'黑色直筒西裤',hex:'#1e1e1e',slot:'bottom',mat:'羊毛',price:560,wears:70,last:3},
+{name:'灰色百褶半裙',hex:'#9a9b98',slot:'bottom',mat:'羊毛',price:480,wears:19,last:27},
+{name:'米白阔腿裤',hex:'#e6dfcf',slot:'bottom',mat:'亚麻',price:430,wears:25,last:61},
+{name:'深棕乐福鞋',hex:'#3e2c22',slot:'shoes',mat:'皮',price:980,wears:120,last:1},
+{name:'黑色短靴',hex:'#222222',slot:'shoes',mat:'皮',price:1200,wears:54,last:14},
+{name:'珍珠耳钉',hex:'#efe8d8',slot:'accent',mat:'珍珠',price:260,wears:47,last:8},
+{name:'藏青西装外套',hex:'#2a3550',slot:'outer',mat:'羊毛',price:1280,wears:29,last:21},
+{name:'卡其风衣',hex:'#b9a27c',slot:'outer',mat:'棉质斜纹',price:1490,wears:36,last:10},
+{name:'黑色高领针织',hex:'#1c1c1c',slot:'top',mat:'针织',price:360,wears:52,last:4},
+{name:'深蓝直筒牛仔裤',hex:'#2f4560',slot:'bottom',mat:'丹宁',price:450,wears:77,last:6},
+{name:'白色运动鞋',hex:'#f2f2ef',slot:'shoes',mat:'皮',price:690,wears:95,last:2},
+{name:'黑色托特包',hex:'#252525',slot:'accent',mat:'皮',price:880,wears:110,last:1}
+];
+const WX=[{k:'rain',ic:'☂',t:'14°C · 小雨'},{k:'cold',ic:'❄',t:'3°C · 晴冷'},{k:'warm',ic:'☀',t:'25°C · 晴'}];
+const L=(t,items,why,muse)=>({t,items,why,muse});
+const SCENES={
+office:{n:'Office',zh:'上班',rule:'舒服一整天 · 能开会也能加班 · 不用多想',looks:[
+ L('蓝白日常',['卡其风衣','白衬衫','深蓝直筒牛仔裤','深棕乐福鞋','黑色托特包'],'牛仔蓝配白衬衫是最不会出错的对比，一件风衣让整体立刻利落起来。','hokusai'),
+ L('墨绿与黑',['墨绿开衫','黑色高领针织','黑色直筒西裤','黑色短靴','珍珠耳钉'],'墨绿开衫配黑色高领，克制但有温度，适合需要专注的一天。','mood'),
+ L('同色系周五',['牛仔外套','雾蓝针织衫','灰色百褶半裙','白色运动鞋','黑色托特包'],'雾蓝、灰、牛仔蓝在同一个色系里，配运动鞋，舒服但不随便。','scandi')]},
+gallery:{n:'Gallery',zh:'看展',rule:'走得动 · 拍照好看 · 别和展品抢戏',looks:[
+ L('站在睡莲前',['燕麦羊毛大衣','薰衣草真丝吊带','米白阔腿裤','白色运动鞋','薰衣草丝巾'],'燕麦、薰衣草和米白都很轻——在展厅的白墙前，你就像一幅低对比的画。','monet'),
+ L('回头的那一刻',['牛仔外套','白衬衫','黑色直筒西裤','深棕乐福鞋','珍珠耳钉'],'牛仔外套降低正式感，珍珠耳钉是全身唯一的高光。','vermeer'),
+ L('长线条',['卡其风衣','黑色高领针织','深蓝直筒牛仔裤','黑色短靴','黑色托特包'],'风衣与高领拉出一条长线，适合在展厅里慢慢走、慢慢看。','hammershoi')]},
+date:{n:'Date',zh:'约会',rule:'像你自己 · 有一点心思 · 不必用力',looks:[
+ L('说不出口',['墨绿开衫','薰衣草真丝吊带','黑色直筒西裤','黑色短靴','珍珠耳钉'],'墨绿与薰衣草真丝之间的那一点反差，就是全部的心事。','mood'),
+ L('温柔的未来',['卡其风衣','白衬衫','米白阔腿裤','深棕乐福鞋','薰衣草丝巾'],'卡其、白和米白都很柔和，一条丝巾负责温度。','her'),
+ L('一半一半',['牛仔外套','黑色高领针织','灰色百褶半裙','黑色短靴','珍珠耳钉'],'牛仔外套配百褶裙，正式和随意刚好各占一半。','fire')]},
+concert:{n:'Concert',zh:'演唱会',rule:'要站很久 · 人多方便行动 · 散场会冷 · 包要小',looks:[
+ L('台下的光',['牛仔外套','黑色高领针织','黑色直筒西裤','黑色短靴','珍珠耳钉'],'全黑打底在舞台灯光里最干净，牛仔外套方便脱穿，珍珠耳钉会在光扫过时闪一下。','vermeer'),
+ L('一整晚都舒服',['卡其风衣','白衬衫','深蓝直筒牛仔裤','白色运动鞋','薰衣草丝巾'],'运动鞋站三个小时也不累；散场后天凉，风衣刚好披上。','hokusai'),
+ L('应援色',['墨绿开衫','薰衣草真丝吊带','灰色百褶半裙','黑色短靴','薰衣草丝巾'],'把应援色放在吊带和丝巾上，不必整套荧光，也能被同好一眼认出。','monet')]},
+career:{n:'Career Fair',zh:'招聘会',rule:'得体但不僵硬 · 方便站一整天 · 有地方放简历',looks:[
+ L('可信又松弛',['藏青西装外套','白衬衫','黑色直筒西裤','深棕乐福鞋','黑色托特包'],'深色西装建立信任感，白衬衫让脸更亮；托特包放得下 A4 简历，乐福鞋让你站一整天也不累。','vermeer'),
+ L('安静的专业',['燕麦羊毛大衣','黑色高领针织','灰色百褶半裙','黑色短靴','珍珠耳钉'],'全身无彩色，只靠明度和质感分层次——在嘈杂的会场里，安静反而更容易被记住。','hammershoi'),
+ L('有一点自己',['藏青西装外套','雾蓝针织衫','米白阔腿裤','深棕乐福鞋','薰衣草丝巾'],'在标准的西装框架里放进一抹雾蓝和薰衣草——招聘官记住的，往往是那一点点不同。','monet')]}};
+const WB=n=>WARDROBE.find(w=>w.name===n);
+function adapt(look,wx){let it=look.items.map(WB).filter(Boolean);const by=sl=>it.find(w=>w.slot===sl);const swap=(sl,n)=>{const w=WB(n);if(!w)return;it=it.filter(x=>x.slot!==sl);it.push(w)};let note='';
+  if(wx==='warm'){it=it.filter(w=>w.slot!=='outer');if(by('top')&&by('top').name==='黑色高领针织')swap('top','白衬衫');if(by('shoes')&&by('shoes').name==='黑色短靴')swap('shoes','深棕乐福鞋');note='25°C：外套留在家，换成透气的上衣。'}
+  else if(wx==='cold'){const o=by('outer');if(!o||!/羊毛/.test(o.mat))swap('outer','燕麦羊毛大衣');if(by('shoes')&&/运动鞋|乐福/.test(by('shoes').name))swap('shoes','黑色短靴');note='3°C：换上羊毛大衣和短靴，再加一条围巾。'}
+  else{if(by('shoes')&&!/靴/.test(by('shoes').name))swap('shoes','黑色短靴');note='小雨：鞋换成短靴，记得带伞。'}
+  const order=['outer','top','bottom','shoes','accent'];it.sort((a,b)=>order.indexOf(a.slot)-order.indexOf(b.slot));
+  return{pieces:it.map(w=>({slot:w.slot,hex:w.hex,name:w.name,material:w.mat})),note}}
+const SUBS={
+spring:{n:'春',e:'Spring',subs:{
+ light:['浅春','Light','暖 · 最浅 · 清透',[['#f7cfc0','蜜桃'],['#f9e7a8','奶黄'],['#b9e0c9','薄荷'],['#a9d6e5','浅水蓝'],['#f4b6b8','珊瑚粉'],['#fbf3e4','象牙']]],
+ warm:['暖春','Warm','最暖 · 明亮',[['#f2a65a','杏橘'],['#e9c46a','金黄'],['#a7c957','嫩芽绿'],['#e07a5f','番茄珊瑚'],['#d4a373','驼杏'],['#fff1d0','奶油']]],
+ bright:['净春','Bright','暖 · 最鲜明 · 高对比',[['#ff6f61','亮珊瑚'],['#00b4a6','亮青'],['#ffd23f','柠檬黄'],['#ff4f9a','亮粉'],['#3ec300','青柠绿'],['#1f8fff','晴空蓝']]],
+ true:['正春','True','暖 · 明亮 · 清澈',[['#f28482','西瓜红'],['#f6bd60','暖阳黄'],['#2ec4b6','碧湖'],['#90be6d','草绿'],['#f7ede2','奶白'],['#e76f51','橘红']]]}},
+summer:{n:'夏',e:'Summer',subs:{
+ light:['浅夏','Light','冷 · 最浅 · 柔',[['#c7d6ec','粉蓝'],['#e9c7d6','樱粉'],['#d8d0ea','淡紫'],['#bfe0d8','薄荷灰'],['#f1eff4','雾白'],['#a9c1d9','天蓝']]],
+ cool:['冷夏','Cool','最冷 · 柔和',[['#6f8fbf','牛仔蓝'],['#9a7fb5','薰衣草紫'],['#c7638d','玫红'],['#5f9ea0','冷青'],['#8892a6','蓝灰'],['#d6dbe6','银灰']]],
+ soft:['柔夏','Soft','冷 · 最柔 · 雾感',[['#a3a7b8','雾霾蓝灰'],['#b49aa6','灰玫'],['#9db1a6','鼠尾草'],['#c9b7c4','灰紫'],['#7c8a97','石板'],['#d8cfc7','灰米']]],
+ true:['正夏','True','冷 · 柔和 · 中浅',[['#7c9ed9','矢车菊'],['#c98bb3','莓粉'],['#8fb8b0','灰绿'],['#5b6f99','深牛仔'],['#e2c4ce','藕粉'],['#d9dde2','银灰']]]}},
+autumn:{n:'秋',e:'Autumn',subs:{
+ deep:['深秋','Deep','暖 · 最深 · 浓郁',[['#6b2d2a','酒红棕'],['#2f4a3a','森林绿'],['#7a5230','巧克力'],['#a0522d','赭红'],['#1f4e5a','深青'],['#c08a3e','芥末金']]],
+ warm:['暖秋','Warm','最暖 · 大地',[['#c46a2b','南瓜橙'],['#b5892f','芥末'],['#8a6a3a','驼棕'],['#a63d2b','铁锈红'],['#6b7a2f','橄榄'],['#e1b27a','焦糖奶']]],
+ soft:['柔秋','Soft','暖 · 最柔 · 灰调',[['#b99a7a','灰驼'],['#9fa38a','苔灰'],['#c49a8a','灰橘粉'],['#8c7b6b','灰褐'],['#d6c7a8','燕麦'],['#7a8a7a','灰绿']]],
+ true:['正秋','True','暖 · 浓郁 · 中深',[['#b0652a','焦糖'],['#8b7b3e','橄榄'],['#6b4528','可可'],['#c69b6b','驼色'],['#4f5c33','苔绿'],['#9e4f32','铁锈红']]]}},
+winter:{n:'冬',e:'Winter',subs:{
+ deep:['深冬','Deep','冷 · 最深',[['#141414','纯黑'],['#3b0f2f','黑莓'],['#0b3d2e','墨绿'],['#1b2a5a','午夜蓝'],['#7a0f2a','深酒红'],['#eeeeee','冷白']]],
+ cool:['冷冬','Cool','最冷 · 鲜明',[['#213a86','宝蓝'],['#b81f5b','莓红'],['#f7f7f5','雪白'],['#5f2a7a','葡萄紫'],['#0f6e66','祖母绿'],['#9aa3ad','冰灰']]],
+ bright:['净冬','Bright','冷 · 最鲜明 · 高对比',[['#e6005c','亮玫红'],['#0057ff','电光蓝'],['#00a676','翡翠绿'],['#111111','黑'],['#ffffff','纯白'],['#8a2be2','亮紫']]],
+ true:['正冬','True','冷 · 鲜明 · 深',[['#141414','纯黑'],['#f7f7f5','雪白'],['#213a86','宝蓝'],['#b81f5b','莓红'],['#0f6e66','祖母绿'],['#5f2a7a','葡萄紫']]]}}};
+const ALLSW=Object.entries(SUBS).flatMap(([k,v])=>Object.entries(v.subs).flatMap(([sk,sv])=>sv[3].map(c=>({hex:c[0],name:c[1],set:k+'-'+sk}))));
+const MARKETS={US:{n:'美国',sym:'$',rate:7.1},EU:{n:'欧盟',sym:'€',rate:7.7},UK:{n:'英国',sym:'£',rate:9.0},JP:{n:'日本',sym:'¥',rate:.047},CN:{n:'中国',sym:'¥',rate:1}};
+const BASE={outer:1590,top:590,bottom:690,shoes:1190,accent:290};
+
+/* ---------- state ---------- */
+const S={kind:'all',scene:'office',wx:0,custom:null,sceneBusy:false,dsub:'soft',tab:'home',result:null,upload:null,dset:'summer',didx:0,photo:null,under:false,underRes:null,seg:'closet',market:'US',aiBusy:false,heroPlayed:false};
+let sampleFn=null;
+function genHist(seed,base){const r=rng(seed);let p=base;const a=[];for(let i=0;i<30;i++){if(r()<.08)p=base*(.74+r()*.1);else p+= (base-p)*.35+(r()-.5)*base*.035;a.push(Math.round(p))}return a}
+function defaults(){const now=Date.now();
+  const mk=(id,name,hex,slot,shop,base,hoursAgo,tRatio)=>{const hist=genHist(hash(name),base);return{id,name,hex,slot,shop,hist,target:Math.round(hist.at(-1)*tRatio/10)*10,added:now-hoursAgo*3600e3}};
+  return{looks:[],picks:[],feels:{},watch:[mk('w1','薰衣草雾真丝衬衫','#c9c3d9','top','示例商家 A',690,60,1.06),mk('w2','深潭绿麂皮乐福鞋','#3f5a57','shoes','示例商家 B',1290,10,.86)]}}
+let store;
+try{store=JSON.parse(localStorage.getItem('mr.v2'))||defaults()}catch(e){store=defaults()}
+store.worn=store.worn||{};store.photos=store.photos||{};store.custom=store.custom||[];store.custom.forEach(i=>{if(!WARDROBE.some(w=>w.name===i.name))WARDROBE.push(i)});WARDROBE.forEach(w=>{const ph=store.photos[w.name];if(ph)w.hex=ph.hex});const wearsOf=w=>w.wears+(store.worn[w.name]||0);
+function save(){try{localStorage.setItem('mr.v2',JSON.stringify(store))}catch(e){}}
+
+/* ---------- palette extraction (real, on-device) ---------- */
+function extractPalette(img,k=6){
+  const c=document.createElement('canvas');const W=90,H=Math.max(1,Math.round(90*img.naturalHeight/img.naturalWidth));c.width=W;c.height=H;
+  const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,W,H);const d=x.getImageData(0,0,W,H).data;const px=[];
+  for(let i=0;i<d.length;i+=4){if(d[i+3]>127)px.push([d[i],d[i+1],d[i+2]])}
+  const lum=p=>(p[0]*.3+p[1]*.59+p[2]*.11);
+  const sorted=[...px].sort((a,b)=>lum(a)-lum(b));let cents=Array.from({length:k},(_,i)=>[...sorted[Math.floor((i+.5)*sorted.length/k)]]);
+  const asg=new Int16Array(px.length);
+  for(let it=0;it<12;it++){const sums=cents.map(()=>[0,0,0,0]);
+    for(let i=0;i<px.length;i++){const p=px[i];let bi=0,bd=1e12;for(let j=0;j<k;j++){const c2=cents[j];const dd=(p[0]-c2[0])**2+(p[1]-c2[1])**2+(p[2]-c2[2])**2;if(dd<bd){bd=dd;bi=j}}asg[i]=bi;const s=sums[bi];s[0]+=p[0];s[1]+=p[1];s[2]+=p[2];s[3]++}
+    cents=cents.map((c2,j)=>sums[j][3]?[sums[j][0]/sums[j][3],sums[j][1]/sums[j][3],sums[j][2]/sums[j][3]]:c2)}
+  const cnt=new Array(k).fill(0);asg.forEach(a=>cnt[a]++);
+  const ls=px.map(p=>lum(p)/255);const mean=ls.reduce((a,b)=>a+b,0)/ls.length;const contrast=Math.sqrt(ls.reduce((a,b)=>a+(b-mean)**2,0)/ls.length);
+  const pal=cents.map((c2,j)=>({hex:rgbToHex(...c2),share:cnt[j]/px.length})).filter(p=>p.share>.01).sort((a,b)=>b.share-a.share);
+  const out=[];pal.forEach(p=>{const n=out.find(o=>dE(o.hex,p.hex)<10);if(n)n.share+=p.share;else out.push(p)});
+  out.forEach(p=>p.name=nameColor(p.hex));
+  while(out.length<5)out.push({...out[out.length-1]});
+  return{palette:out,contrast,mean}}
+function material(hex,slot,ct){const[h,s,l]=hsl(hex);
+  if(slot==='shoes')return s<.25?(l<.3?'哑光皮革':'麂皮'):'漆面皮革';
+  if(slot==='accent')return s>.45?'珐琅':'珍珠 / 金属';
+  if(s>.5)return'真丝缎面';if(l>.78)return ct<.18?'水洗亚麻':'府绸棉';if(l<.3)return'精纺羊毛';return ct<.18?'羊绒针织':'棉质斜纹'}
+const GARM={outer:['长外套','短夹克','开衫'],top:['衬衫','针织衫','背心'],bottom:['阔腿裤','半身裙','直筒裤'],shoes:['乐福鞋','短靴','玛丽珍鞋'],accent:['丝巾','耳饰','小包']};
+function localAnalyze(ex){
+  const p=ex.palette;const used=new Set();
+  const pick=fn=>{const cand=p.filter(c=>!used.has(c.hex));const pool=cand.length?cand:p;const c=pool.reduce((a,b)=>fn(b)>fn(a)?b:a);used.add(c.hex);return c};
+  const outer=pick(c=>c.share),shoes=pick(c=>-hsl(c.hex)[2]),accent=pick(c=>hsl(c.hex)[1]*(1.2-c.share)),top=pick(c=>hsl(c.hex)[2]),bottom=pick(c=>c.share);
+  const seed=hash(p.map(c=>c.hex).join(''));
+  const pieces=[['outer',outer],['top',top],['bottom',bottom],['shoes',shoes],['accent',accent]].map(([slot,c],i)=>({slot,hex:c.hex,name:c.name+GARM[slot][(seed+i)%3],material:material(c.hex,slot,ex.contrast)}));
+  const av=p.reduce((a,c)=>{const[,s,l]=hsl(c.hex);return{s:a.s+s*c.share,l:a.l+l*c.share,w:a.w+(isWarm(c.hex)?c.share:0)}},{s:0,l:0,w:0});
+  const top1=Math.round(p[0].share*100);const big=top1>40;const hi=ex.contrast>.22;
+  return{source:'local',kind:'upload',title:'我的灵感图',artist:'',year:'',palette:p,
+    composition:`主色约占 ${top1}%，${big?'一个大面积主色统领画面':'几种颜色势均力敌'} → 让「${outer.name}」承担最大面积，其余颜色按面积递减，分配给上衣、下装与配饰。`,
+    texture:`${hi?'明暗对比强烈、边界分明':'明暗过渡平缓、边界柔和'} → ${hi?'挺括、轮廓清晰的面料':'柔软、哑光、带空气感的面料'}。`,
+    mood:[av.w>.5?'温暖':'清冷',av.l>.6?'明亮':(av.l<.35?'深邃':'沉静'),av.s>.45?'浓烈':'柔和'].join(' · '),
+    principle:(hi?'高对比':'低对比')+' · '+(big?'主色统领':'多色平衡'),
+    label:`这张图像的颜色并不是随意排列的：${big?'一个主色占据了大部分画面':'几种颜色彼此平衡'}，${hi?'明暗对比清晰':'明暗过渡柔和'}。这套搭配沿用同样的比例——大面积的颜色穿在最外层，最鲜明的一点「${accent.name}」只留给配饰，让视线有一个落点。`,
+    question:'这张图像里，是哪一种颜色最先抓住了你？它让你想起了什么？',pieces,feel:null}}
+function normalize(o,local){const H=/^#[0-9a-f]{6}$/i;const s=(v,f)=>typeof v==='string'&&v.trim()?v.trim():f;
+  const pal=(Array.isArray(o&&o.palette)?o.palette:[]).filter(c=>c&&H.test(c.hex)).slice(0,6).map(c=>({hex:c.hex.toLowerCase(),name:s(c.name,nameColor(c.hex)).slice(0,8)}));
+  const pcs=['outer','top','bottom','shoes','accent'].map(sl=>{const q=(o&&o.pieces||[]).find(x=>x&&x.slot===sl);const lp=local.pieces.find(x=>x.slot===sl);return q&&H.test(q.hex)?{slot:sl,hex:q.hex.toLowerCase(),name:s(q.name,lp.name).slice(0,20),material:s(q.material,lp.material).slice(0,16)}:lp});
+  const dc=o&&o.decode&&Array.isArray(o.decode.items)&&o.decode.items.length?{items:o.decode.items.slice(0,6).map(String),pattern:s(o.decode.pattern,''),style:s(o.decode.style,'')}:null;
+  return{...local,source:'ai',kind:KIND[o&&o.kind]&&o.kind!=='upload'?o.kind:'upload',decode:dc,title:s(o.title,local.title),artist:s(o.artist,''),year:s(o.year,''),palette:pal.length>=3?pal:local.palette,composition:s(o.composition,local.composition),texture:s(o.texture,local.texture),mood:s(o.mood,local.mood),principle:s(o.principle,local.principle).slice(0,14),label:s(o.label,local.label),question:s(o.question,local.question),pieces:pcs}}
+
+/* ---------- drawing ---------- */
+
+/* ---------- muse visuals: original fashion illustrations (no film stills, no real people) ---------- */
+const PAINT_IMG={};const ILL={};
+function museVis(p,cls){if(PAINT_IMG[p.id])return`<img class="mv ${cls||''}" src="${PAINT_IMG[p.id]}" alt="${esc(p.title)}">`;
+  if(p.kind==='film'||p.kind==='cos'||p.kind==='trend'){return`<img class="mv ${cls||''}" src="${illus(p)}" alt="${esc(p.title)} 的原创穿搭插画">`}return field(p.palette)}
+function illus(p){if(ILL[p.id])return ILL[p.id];const c=document.createElement('canvas');c.width=680;c.height=886;const x=c.getContext('2d');x.scale(2,2);const W=340,H=443;
+  let seed=hash(p.id);const R=()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};const pick=a=>a[Math.floor(R()*a.length)];
+  const pal=p.palette.map(c=>c.hex);const bgc=pal.filter(h=>!p.pieces.some(q=>q.hex===h));const bgs=(bgc.length?bgc:pal);
+  function dabs(n,box,cols,ang,len,wid,al){for(let i=0;i<n;i++){const px=box[0]+R()*box[2],py=box[1]+R()*box[3],a=ang+(R()-.5)*.5,l=len[0]+R()*(len[1]-len[0]);x.strokeStyle=pick(cols);x.globalAlpha=al[0]+R()*(al[1]-al[0]);x.lineWidth=wid[0]+R()*(wid[1]-wid[0]);x.lineCap='round';x.beginPath();x.moveTo(px-Math.cos(a)*l/2,py-Math.sin(a)*l/2);x.quadraticCurveTo(px+(R()-.5)*2,py+(R()-.5)*2,px+Math.cos(a)*l/2,py+Math.sin(a)*l/2);x.stroke()}x.globalAlpha=1}
+  const mix=(h,t)=>{const a=hexToRgb(h);return rgbToHex(a[0]+(244-a[0])*t,a[1]+(245-a[1])*t,a[2]+(242-a[2])*t)};
+  x.fillStyle=mix(bgs[0],.55);x.fillRect(0,0,W,H);
+  x.save();x.filter='blur(18px)';bgs.slice(0,4).forEach((h,i)=>{x.globalAlpha=.55;x.fillStyle=mix(h,.35);x.beginPath();x.ellipse(40+R()*260,40+R()*360,90+R()*40,60+R()*40,0,0,7);x.fill()});x.restore();x.globalAlpha=1;
+  dabs(900,[-10,-10,W+20,H+20],bgs.map(h=>mix(h,.3)),p.kind==='film'?Math.PI/2:0,[5,16],[1.4,3.6],[.12,.32]);
+  x.fillStyle='rgba(0,0,0,.08)';x.beginPath();x.ellipse(172,418,70,8,0,0,7);x.fill();
+  const by=Object.fromEntries(p.pieces.map(q=>[q.slot,q]));const ink='#2a3330';
+  const near=(h,k)=>{const a=hexToRgb(h);return[rgbToHex(a[0]*(1-k),a[1]*(1-k),a[2]*(1-k)),h,mix(h,k*1.6)]};
+  function shape(d,col,ang){const P=new Path2D(d);x.save();x.clip(P);x.fillStyle=col;x.fill(P);dabs(520,[100,30,150,400],near(col,.14),ang,[4,11],[.9,2.1],[.3,.65]);x.restore();x.save();x.strokeStyle=ink;x.lineWidth=.7;x.globalAlpha=.65;x.setLineDash([20,2.5,8,3.5]);x.stroke(P);x.restore();return P}
+  x.save();x.translate(172,236);x.scale(.86,.86);x.rotate(-.03);x.translate(-172,-215);
+  const skin='#efd6c9';const skirt=by.bottom&&/裙/.test(by.bottom.name);
+  if(skirt){x.fillStyle=skin;x.fillRect(158,330,9,78);x.fillRect(178,330,9,78);shape(/长/.test(by.bottom.name)?'M150 188L194 188L214 392Q172 402 130 392Z':'M152 188L192 188L210 318Q172 328 134 318Z',by.bottom.hex,Math.PI/2)}
+  else if(by.bottom){shape('M151 186L169 186L168 410L146 411ZM172 186L191 186L202 408L180 411Z',by.bottom.hex,Math.PI/2)}
+  const sh=by.shoes?by.shoes.hex:'#3a3330';x.fillStyle=sh;x.beginPath();x.ellipse(158,412,11,4.2,0,0,7);x.ellipse(188,412,11,4.2,.1,0,7);x.fill();
+  if(by.top){shape('M160 92Q172 98 184 92L200 100Q206 140 207 196L198 198Q196 160 194 140L192 196L152 196L150 140Q148 160 146 198L137 196Q138 140 144 100Z',by.top.hex,Math.PI/2)}
+  if(by.outer){const long=/长|大衣|风衣|斗篷/.test(by.outer.name);const hem=long?324:236;
+    const cd=`M160 92Q172 98 184 92L204 101Q213 140 215 204L219 214L209 217Q205 182 203 152L${long?211:206} ${hem}Q192 ${hem+8} 182 ${hem-2}L179 104L165 104L162 ${hem-2}Q152 ${hem+8} 133 ${hem}L137 152Q135 182 131 217L121 214L125 204Q127 140 136 101Z`;shape(cd,by.outer.hex,Math.PI/2+.1)}
+  x.fillStyle=skin;[[125,221],[215,221]].forEach(([a,b])=>{x.beginPath();x.ellipse(a,b,4.2,6,0,0,7);x.fill()});
+  x.fillRect(166,74,12,22);x.beginPath();x.ellipse(172,60,12.5,15.5,-.05,0,7);x.fill();
+  const hairC=p.id==='mahou'?'#5a3f3a':(p.id==='vampire'?'#1d1a1c':'#5e4a3c');const hair=new Path2D('M156 60Q154 37 173 36Q192 37 189 60Q192 82 191 100L185 70Q180 50 165 55L161 72Q159 90 154 99Q152 78 156 60Z');x.save();x.clip(hair);x.fillStyle=hairC;x.fill(hair);dabs(120,[150,32,44,70],near(hairC,.2),Math.PI/2+.2,[4,10],[.6,1.3],[.4,.8]);x.restore();
+  x.strokeStyle=ink;x.lineWidth=.6;x.globalAlpha=.8;x.beginPath();x.moveTo(166,60.5);x.quadraticCurveTo(168,61.8,170,60.6);x.moveTo(175,60.6);x.quadraticCurveTo(177,61.8,179,60.5);x.stroke();x.globalAlpha=1;x.strokeStyle='#c9606f';x.lineWidth=1.1;x.beginPath();x.moveTo(171,69.8);x.lineTo(174.5,69.8);x.stroke();
+  if(by.accent){const a=by.accent;x.fillStyle=a.hex;x.strokeStyle=a.hex;
+    if(/帽/.test(a.name)){x.beginPath();x.ellipse(172,44,32,6,0,0,7);x.fill();x.beginPath();if(/宽檐/.test(a.name)){x.moveTo(157,44);x.quadraticCurveTo(157,24,172,24);x.quadraticCurveTo(187,24,187,44)}else{x.moveTo(158,43);x.lineTo(176,4);x.lineTo(188,43)}x.fill();x.fillStyle='rgba(0,0,0,.25)';x.fillRect(158,38,29,3)}
+    else if(/蝴蝶结/.test(a.name)){x.beginPath();x.moveTo(172,40);x.lineTo(156,32);x.lineTo(158,48);x.closePath();x.moveTo(172,40);x.lineTo(188,32);x.lineTo(186,48);x.closePath();x.fill()}
+    else if(/巾|领巾/.test(a.name)){x.lineWidth=3;x.lineCap='round';x.beginPath();x.moveTo(163,95);x.quadraticCurveTo(172,101,181,95);x.moveTo(168,99);x.quadraticCurveTo(164,116,170,130);x.stroke()}
+    else if(/包/.test(a.name)){x.beginPath();x.roundRect?x.roundRect(210,222,22,18,3):x.rect(210,222,22,18);x.fill();x.lineWidth=1.2;x.beginPath();x.moveTo(214,222);x.quadraticCurveTo(221,212,228,222);x.stroke()}
+    else if(/眼镜/.test(a.name)){x.lineWidth=1;x.beginPath();x.ellipse(167,61,4,3,0,0,7);x.ellipse(178,61,4,3,0,0,7);x.moveTo(171,61);x.lineTo(174,61);x.stroke()}
+    else{x.beginPath();x.arc(160,70,2.4,0,7);x.arc(184,70,2.4,0,7);x.fill()}}
+  if(p.id==='vampire'){x.fillStyle='#7a0f1f';x.globalAlpha=.85;x.beginPath();x.moveTo(146,96);x.lineTo(160,74);x.lineTo(164,96);x.closePath();x.moveTo(198,96);x.lineTo(184,74);x.lineTo(180,96);x.closePath();x.fill();x.globalAlpha=1}
+  x.restore();
+  for(let i=0;i<4000;i++){x.fillStyle=R()<.5?'rgba(255,255,255,.06)':'rgba(0,0,0,.035)';x.fillRect(R()*W,R()*H,.5,.5)}
+  return ILL[p.id]=c.toDataURL('image/jpeg',.86)}
+
+function field(pal){const w=[.34,.22,.16,.12,.09,.07];return`<div class="field">${pal.map((c,i)=>`<i style="background:${c.hex};flex:${c.share||w[i]||.08}"></i>`).join('')}</div>`}
+function matKey(m=''){if(/提花|织锦|刺绣/.test(m))return'jacq';if(/丝绒|羊毛|呢|麂皮/.test(m))return'wool';if(/丝|缎|雪纺/.test(m))return'silk';if(/针织|羊绒/.test(m))return'knit';if(/丹宁|斜纹/.test(m))return'twill';if(/亚麻|棉|府绸|麻/.test(m))return'linen';if(/皮/.test(m))return'leather';return'plain'}
+function defs(u){return`<defs>
+<pattern id="${u}linen" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 1H4M0 3H4" stroke="#fff" stroke-opacity=".16" stroke-width=".6"/><path d="M1 0V4" stroke="#000" stroke-opacity=".05" stroke-width=".5"/></pattern>
+<pattern id="${u}knit" width="6" height="5" patternUnits="userSpaceOnUse"><path d="M0 0L3 4L6 0" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width=".8"/></pattern>
+<pattern id="${u}twill" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0V5" stroke="#fff" stroke-opacity=".16" stroke-width="1.2"/></pattern>
+<pattern id="${u}jacq" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M5 1L9 5L5 9L1 5Z" fill="none" stroke="#fff" stroke-opacity=".32" stroke-width=".7"/><circle cx="5" cy="5" r="1" fill="#fff" fill-opacity=".32"/></pattern>
+<linearGradient id="${u}silk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".42" stop-color="#fff" stop-opacity=".3"/><stop offset=".56" stop-color="#fff" stop-opacity=".04"/><stop offset="1" stop-color="#000" stop-opacity=".12"/></linearGradient>
+<linearGradient id="${u}leather" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient>
+<filter id="${u}wool" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .28"/></feComponentTransfer><feComposite in2="SourceGraphic" operator="in"/></filter>
+<filter id="${u}sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3.2" flood-color="#1b2321" flood-opacity=".16"/></filter></defs>`}
+function overlay(d,k,u){if(k==='plain')return'';if(k==='wool')return`<path d="${d}" fill="#fff" filter="url(#${u}wool)"/>`;return`<path d="${d}" fill="url(#${u}${k})"/>`}
+const SHAPES={
+outer:{t:'translate(16,18)',d:'M42 0L78 0L86 9L116 20L120 112L103 114L100 64L100 156L20 156L20 64L17 114L0 112L4 20L34 9Z',x:'M42 0L60 46L78 0M60 46V156'},
+top:{t:'translate(162,12)',d:'M36 0Q50 9 64 0L97 12L104 40L86 44L84 84L16 84L14 44L-4 40L3 12Z',x:'M36 0Q50 9 64 0'},
+bottom:{t:'translate(176,108)',d:'M4 0L72 0L80 128L50 128L38 36L26 128L-4 128Z',x:'M4 8H72M38 8V36'},
+shoes:{t:'translate(18,198)',d:'M0 14Q0 2 16 2L36 4Q50 6 52 18Q52 26 42 26L8 26Q0 26 0 14ZM60 22Q60 10 76 10L96 12Q110 14 112 26Q112 34 102 34L68 34Q60 34 60 22Z'},
+accent:{t:'translate(134,196)',d:'M0 16Q0 10 6 10H30Q36 10 36 16V34Q36 40 30 40H6Q0 40 0 34Z',x:'M9 10Q18 -4 27 10'}};
+let UID=0;const PBOX={outer:[-6,-8,132,172],top:[-10,-6,120,96],bottom:[-10,-4,100,138],shoes:[0,-8,112,46],accent:[-8,-6,52,52]};
+function flatlay(pieces){const u='f'+(UID++)+'_';const by=Object.fromEntries(pieces.map(p=>[p.slot,p]));
+  return`<svg viewBox="0 0 300 250" class="flat" role="img" aria-label="穿搭平铺图">${defs(u)}${['outer','bottom','top','shoes','accent'].map(sl=>{const p=by[sl];if(!p)return'';const sh=SHAPES[sl];const k=matKey(p.material);const ln=textOn(p.hex)==='#fbfbf9'?'rgba(255,255,255,.28)':'rgba(0,0,0,.14)';
+  const ph=store.photos[p.name];if(ph){const bx=PBOX[sl];return`<g transform="${sh.t}" filter="url(#${u}sh)"><image href="${ph.src}" x="${bx[0]}" y="${bx[1]}" width="${bx[2]}" height="${bx[3]}" preserveAspectRatio="xMidYMid meet"/></g>`}
+  return`<g transform="${sh.t}" filter="url(#${u}sh)"><path d="${sh.d}" fill="${p.hex}" stroke="rgba(27,35,33,.12)" stroke-width=".8"/>${overlay(sh.d,k,u)}${sh.x?`<path d="${sh.x}" fill="none" stroke="${sl==='accent'?p.hex:ln}" stroke-width="${sl==='accent'?2.4:1}"/>`:''}</g>`}).join('')}</svg>`}
+function tile(it){const ph=store.photos[it.name];if(ph)return`<div class="wph"><img src="${ph.src}" alt="${esc(it.name)}"></div>`;const u='t'+(UID++)+'_';const sh=SHAPES[it.slot];const box={outer:'-10 -10 140 176',top:'-14 -14 132 112',bottom:'-24 -10 124 148',shoes:'-8 -14 128 60',accent:'-14 -14 64 64'}[it.slot];
+  return`<svg viewBox="${box}" style="aspect-ratio:1">${defs(u)}<path d="${sh.d}" fill="${it.hex}" stroke="rgba(27,35,33,.12)"/>${overlay(sh.d,matKey(it.mat),u)}</svg>`}
+function spark(h,target){const W=300,H=60,all=[...h,target],mn=Math.min(...all)*.97,mx=Math.max(...all)*1.02;const X=i=>i/(h.length-1)*W,Y=v=>H-(v-mn)/(mx-mn)*H;
+  const pts=h.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');const mi=h.indexOf(Math.min(...h));
+  return`<svg class="spark" viewBox="-4 -6 308 72"><line x1="0" x2="${W}" y1="${Y(target)}" y2="${Y(target)}" stroke="#5f7f93" stroke-dasharray="3 3" stroke-width="1"/><text x="${W}" y="${Y(target)-4}" text-anchor="end" font-size="9" fill="#5f7f93">目标</text><polyline points="${pts}" fill="none" stroke="#1b2321" stroke-width="1.4" stroke-linejoin="round"/><circle cx="${X(mi)}" cy="${Y(h[mi])}" r="2.6" fill="#f4f5f2" stroke="#1b2321"/><circle cx="${W}" cy="${Y(h.at(-1))}" r="3" fill="#1b2321"/></svg>`}
+const fmt=(cny,mk,dec)=>{const v=cny/mk.rate;return mk.sym+(mk===MARKETS.JP?Math.round(v).toLocaleString():(dec&&v<100?v.toFixed(dec):Math.round(v).toLocaleString()))};
+
+/* ---------- matching ---------- */
+const compat=(a,b)=>a===b||(a==='outer'&&b==='top')||(a==='top'&&b==='outer');
+function matchWardrobe(pieces){return pieces.map(p=>{let best=null,bd=1e9;WARDROBE.filter(w=>compat(w.slot,p.slot)).forEach(w=>{const d=dE(w.hex,p.hex);if(d<bd){bd=d;best=w}});return{p,w:best,d:bd,state:bd<16?'own':bd<28?'near':'gap'}})}
+function season(hex){const[,,l]=hsl(hex);const w=isWarm(hex);return w?(l>.55?'spring':'autumn'):(l>.55?'summer':'winter')}
+
+/* ---------- screens ---------- */
+function lookCard(lk,i,n){const ad=adapt(lk,WX[S.wx].k);const muse=PRESETS.find(p=>p.id===lk.muse);
+  return`<article class="lcard"><div class="lc-top"><b>${esc(lk.t)}</b><span>${i+1} / ${n}</span></div>
+  <div class="lc-flat">${flatlay(ad.pieces)}<span class="own">全部来自你的衣橱</span></div>
+  <p class="why">${esc(lk.why)}</p><p class="wnote">${WX[S.wx].ic} ${ad.note}</p>
+  <div class="lc-items">${ad.pieces.map(p=>`<i><em style="background:${p.hex}"></em>${esc(p.name)}</i>`).join('')}</div>
+  <div class="lc-foot">${muse?`<button class="musechip" data-a="openArt" data-id="${muse.id}"><span class="mf">${field(muse.palette)}</span>灵感 · ${esc(muse.title)}</button>`:'<span></span>'}<button class="btn sm" data-a="wear" data-v="${i}">今天穿这套</button></div></article>`}
+function sceneLooks(){return S.scene==='custom'&&S.custom?S.custom.looks:SCENES[S.scene].looks}
+function home(){const Lk=store.looks;const liked=store.picks.filter(p=>p.liked);const yes=Object.values(store.feels).filter(v=>v==='yes').length+liked.length;
+  const my=[...new Set([...liked.map(p=>p.hex),...Lk.flatMap(l=>l.palette.slice(0,3))])].slice(0,16);const today=PRESETS[new Date().getDate()%PRESETS.length];
+  const looks=sceneLooks();const sc=S.scene==='custom'&&S.custom?{rule:S.custom.rule}:SCENES[S.scene];
+  const d=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'short'});
+  return`<section class="today"><div class="today-h"><div><p class="eyebrow">Today · ${d}</p><h2 class="h">今天，你要去哪里？</h2></div><button class="wpill" data-a="weather" title="点击切换天气（演示）">${WX[S.wx].ic} ${WX[S.wx].t}</button></div>
+  <div class="chips scene">${Object.entries(SCENES).map(([k,v])=>`<button class="${S.scene===k?'on':''}" data-a="scene" data-v="${k}">${v.zh}<small>${v.n}</small></button>`).join('')}${S.custom?`<button class="${S.scene==='custom'?'on':''}" data-a="scene" data-v="custom">${esc(S.custom.label)}<small>Custom</small></button>`:''}<button class="addscene" data-a="addScene" aria-label="添加场景">＋</button></div>
+  <p class="rule">${esc(sc.rule)}</p>
+  <div class="carousel">${looks.map((lk,i)=>lookCard(lk,i,looks.length)).join('')}</div>
+  <form class="sceneform" id="sceneform"><input id="sceneIn" placeholder="添加一个场景：面试、婚礼、第一次见家长…" autocomplete="off"><button class="btn sm" ${S.sceneBusy?'disabled':''}>${S.sceneBusy?'搭配中…':'生成'}</button></form>
+  <p class="fine" style="margin-top:8px">左右滑动查看更多搭配 · 天气为演示数据，点右上角切换</p></section>
+  ${diarySection()}
+  <section class="hsec"><p class="eyebrow">Daily Muse · ${KIND[today.kind][1]}</p><h2 class="h">今日灵感</h2>
+  <button class="hcard daily" data-a="openArt" data-id="${today.id}"><div class="daily-field">${museVis(today)}</div>
+  <div><p class="t">${today.title}</p><p class="m">${today.artist}, ${today.year}</p><p class="dsub">每天一个灵感，而不是每天一套"标准答案"。</p><p class="cta">解码并穿上它 →</p></div></button></section>
+  <section class="hsec"><p class="eyebrow">Why Mirari</p><h2 class="h">为什么是 Mirari</h2>
+  <div class="hcard why still"><p class="q1">How do others see me?</p><p class="q2">How do I see myself?</p>
+  <p class="lede">社交媒体是一面只照出别人目光的镜子。Mirari 想做另一面镜子：从你真正喜欢的画面出发，照见你自己的审美。</p></div></section>
+`}
+async function customScene(text){text=text.trim().slice(0,40);if(!text)return;
+  const kw=[[/career|招聘|面试|interview|求职|实习/i,'career'],[/上班|office|工作|开会|通勤|work/i,'office'],[/展|museum|gallery|美术馆|博物馆|艺术/i,'gallery'],[/约会|date|晚餐|dinner|见面/i,'date']];
+  const fallback=()=>{const m=kw.find(k=>k[0].test(text));S.scene=m?m[1]:'office';toast(m?`已按「${SCENES[S.scene].zh}」推荐`:'本机模式：先按「上班」推荐');go()};
+  if(!sampleFn){fallback();return}
+  S.sceneBusy=true;stay();
+  const prompt=`你是 Mirari 照见的穿搭助手。用户今天的安排是："${text}"；天气：${WX[S.wx].t}。只能使用下面衣橱里的单品（名称必须原样照抄）：
+${WARDROBE.map(w=>`${w.name}（${SLOT[w.slot]}）`).join('、')}
+可选的灵感 id（每套挑一个最贴切的）：${PRESETS.map(p=>p.id+'='+p.title).join('，')}
+给出 3 套不同方向的整套搭配。原则：不评价外貌，不说"显瘦""显白"；理由要具体说明这个场合与天气为什么适合。用简体中文。只输出 JSON：
+{"label":"场合的2-4字中文名","rule":"这个场合的穿衣要点，3条，用 · 分隔","looks":[{"t":"4-6字标题","items":["外套名(天热可省略)","上衣名","下装名","鞋名","配饰名"],"why":"一句话理由","muse":"灵感 id"}]}`;
+  try{let out;if(typeof sampleFn.json==='function')out=await sampleFn.json(prompt,{modelTier:'default'});else{const r=await sampleFn(prompt,{modelTier:'default'});out=JSON.parse(r.text.match(/\{[\s\S]*\}/)[0])}
+    const looks=(out.looks||[]).map(l=>({t:String(l.t||'今天这套').slice(0,10),items:(l.items||[]).filter(n=>WB(n)),why:String(l.why||'').slice(0,90),muse:PRESETS.some(p=>p.id===l.muse)?l.muse:null})).filter(l=>l.items.length>=3);
+    if(!looks.length)throw new Error('empty');S.custom={label:String(out.label||text).slice(0,6),rule:String(out.rule||''),looks};S.scene='custom';toast('已为你搭好 '+looks.length+' 套')}
+  catch(e){if(e&&e.code==='not_granted'){sampleFn=null;setPill()}S.sceneBusy=false;fallback();return}
+  S.sceneBusy=false;go()}
+function art(){if(S.result)return result();
+  const list=PRESETS.filter(p=>S.kind==='all'||p.kind===S.kind);
+  return`<p class="eyebrow">Muse-to-Outfit</p><h2 class="h">把打动你的画面，穿在身上</h2><p class="lede sm">一幅油画、一帧电影画面、一个想 cos 的角色、一位博主的穿搭——Mirari 先解码它的视觉语言，再转译成属于你的一套衣服。</p>
+  <div class="chips">${[['all','全部'],['painting','画作'],['film','影视'],['cos','COS'],['trend','穿搭博主']].map(([k,n])=>`<button class="${S.kind===k?'on':''}" data-a="kind" data-v="${k}">${n}</button>`).join('')}</div>
+  <div class="grid">${list.map(p=>`<button class="card" data-a="openArt" data-id="${p.id}"><div class="card-field">${museVis(p)}</div><div class="label"><em class="kd">${KIND[p.kind][0]}</em><b>${p.title}</b><span>${p.artist}, ${p.year}</span></div></button>`).join('')}
+  <button class="card" data-a="pickArt"><div class="card-field plus"><span>＋</span></div><div class="label"><em class="kd">上传</em><b>我的灵感图</b><span>painting · still · cos · OOTD</span></div></button></div>
+  <p class="fine">影视、COS 与穿搭趋势配图均为原创插画，不使用剧照或真人照片；画作将使用公有领域原作。正式版：画作接入博物馆开放版权馆藏，穿搭趋势来自创作者授权内容。</p>`}
+
+function result(){const r=S.result;const m=matchWardrobe(r.pieces);const ownN=m.filter(x=>x.state!=='gap').length;
+  return`<button class="back" data-a="backArt">← 灵感库</button>
+  ${r.image?`<div class="art-img"><img src="${r.image}" alt=""></div>`:`<div class="art-hero">${r.source==="preset"?museVis(r,"hero"):field(r.palette)}</div>`}
+  <p class="eyebrow" style="margin-top:14px">${KIND[r.kind||'upload'][0]} · ${KIND[r.kind||'upload'][1]}</p>
+  <div class="wall" style="margin-top:6px"><p class="t">${esc(r.title)}</p><p class="m">${esc([r.artist,r.year].filter(Boolean).join(', '))||'your image'}</p></div>
+  ${r.source==='ai'?'<span class="badge">✦ AI 深度解读</span>':r.source==='local'?'<span class="badge">本机色彩提取 · 真实计算</span>':''}
+  <div class="pal">${r.palette.filter((c,i,a)=>a.findIndex(x=>x.hex===c.hex)===i).slice(0,6).map(c=>`<div><i style="background:${c.hex}"></i><b>${esc(c.name)}</b><span>${c.hex.toUpperCase()}${c.share?' · '+Math.round(c.share*100)+'%':''}</span></div>`).join('')}</div>
+  ${r.image&&sampleFn&&r.source!=='ai'?`<button class="btn ai" data-a="aiRead" ${S.aiBusy?'disabled':''}>${S.aiBusy?'AI 正在观看这幅图…':'✦ 让 AI 深度解读这幅图'}</button>`:''}
+  ${r.decode?`<h3 class="sec">解码 <em>${r.kind==='cos'?'Signature → Rule → Everyday':'Item → Pattern → Style'}</em></h3>
+  <div class="decode"><div><span>${r.kind==='cos'?'识别点':'单品 Item'}</span><p>${r.decode.items.map(i=>`<i>${esc(i)}</i>`).join('')}</p></div><div><span>${r.kind==='cos'?'转译规则':'规律 Pattern'}</span><p><b>${esc(r.decode.pattern)}</b></p></div><div><span>${r.kind==='cos'?'日常版':'风格 Style'}</span><p class="sty">${esc(r.decode.style)}</p></div></div>
+  <p class="fine">${r.kind==='cos'?'不必穿全套戏服：保留角色的颜色与轮廓，把道具换成日常单品。':'先识别单品，再归纳规律，最后才贴风格标签。标签只是一个名字，规律才是你可以借走的东西。'}</p>`:''}
+  <h3 class="sec">${r.kind==='trend'?'借走规律，换成你的颜色':r.kind==='cos'?'把角色穿进日常':'穿上它'} <em>Wear it your way</em></h3>
+  <div class="flat-wrap">${flatlay(r.pieces)}<span class="tag">${esc(r.principle)}</span></div>
+  <ul class="pieces">${r.pieces.map(p=>`<li><i style="background:${p.hex}"></i><div><b>${esc(p.name)}</b><span>${SLOT[p.slot]} · ${esc(p.material)}</span></div></li>`).join('')}</ul>
+  <div class="placard"><p class="eyebrow">展签 · Wall label</p><p>${esc(r.label)}</p></div>
+  <dl class="reading">${[['色彩 Color',r.palette.slice(0,3).map(c=>c.name).join(' / ')],['构图 Composition',r.composition],['质感 Texture',r.texture],['情绪 Mood',r.mood]].map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
+  <div class="ask"><p class="eyebrow">留给你的问题</p><p class="qq">${esc(r.question)}</p><p class="m">这套搭配像你吗？只有你能回答。</p>
+  <div class="feel">${Object.entries(FEEL).map(([k,v])=>`<button class="${r.feel===k?'on':''}" data-a="feel" data-v="${k}">${v}</button>`).join('')}</div></div>
+  <h3 class="sec">先穿已有的 <em>Shop your closet</em></h3>
+  <p class="lede sm">5 件里有 <b>${ownN}</b> 件可以用你衣橱里的单品完成。只有真正的缺口，才值得去蹲价。</p>
+  <ul class="match">${m.map((x,i)=>{const inW=store.watch.some(w=>w.name===x.p.name);
+    return`<li><div class="pair"><i style="background:${x.p.hex}"></i><i class="${x.state==='gap'?'none':''}" style="${x.state==='gap'?'':'background:'+x.w.hex}"></i></div>
+    <div><b>${esc(x.p.name)}</b><span>${x.state==='own'?'用你的「'+x.w.name+'」':x.state==='near'?'相近：「'+x.w.name+'」，差一点也很好':'衣橱里没有接近的颜色'}</span></div>
+    ${x.state==='gap'?`<button class="st gap ${inW?'done':''}" data-a="addw" data-v="${i}" ${inW?'disabled':''}>${inW?'已在蹲价':'加入蹲价'}</button>`:`<span class="st ${x.state}">${x.state==='own'?'已拥有':'可替代'}</span>`}</li>`}).join('')}</ul>
+  <div class="actions"><button class="btn" data-a="saveLook">记进今天的穿搭日志</button><button class="btn ghost" data-a="toDrape">穿到我身上试试 →</button></div>`}
+
+function curSet(){return S.dset==='art'?'art':S.dset+'-'+S.dsub}
+function drapeColors(){if(S.dset==='art'){const r=S.result||(store.looks.length?{palette:store.looks.at(-1).palette.map(h=>({hex:h,name:nameColor(h)}))}:null);return r?r.palette.slice(0,6).map(c=>[c.hex,c.name]):[]}return SUBS[S.dset].subs[S.dsub][3]}
+function setOf(p){if(p.set!=='art')return p.set;let b=ALLSW[0],bd=1e9;ALLSW.forEach(c=>{const d=dE(c.hex,p.hex);if(d<bd){bd=d;b=c}});return b.set}
+function subMeta(set){const[k,sk]=set.split('-');return{season:k,sub:SUBS[k].subs[sk]}}
+function nameOf(p){const f=ALLSW.find(c=>c.hex===p.hex)||drapeColors().map(c=>({hex:c[0],name:c[1]})).find(c=>c.hex===p.hex);return f?f.name:nameColor(p.hex)}
+function summary(){const liked=store.picks.filter(p=>p.liked);if(!liked.length)return`<div class="empty">每看一种颜色，告诉 Mirari 它像不像你。你的选择会在这里汇成一张属于你的色彩地图。</div>`;
+  const cnt={spring:0,summer:0,autumn:0,winter:0},sc={};liked.forEach(p=>{const st=setOf(p);cnt[st.split('-')[0]]++;sc[st]=(sc[st]||0)+1});
+  const topSub=Object.keys(sc).sort((a,b)=>sc[b]-sc[a])[0];const tm=subMeta(topSub);const max=Math.max(...Object.values(cnt));
+  const out=liked.find(p=>setOf(p).split('-')[0]!==tm.season);
+  return`<div class="bars">${Object.entries(cnt).map(([k,v])=>`<div class="bar"><b>${SUBS[k].n}</b><div><i style="width:${max?v/max*100:0}%"></i></div><span>${v}</span></div>`).join('')}</div>
+  <div class="liked">${liked.map(p=>`<i style="background:${p.hex}"></i>`).join('')}</div>
+  <p class="verdict">你说"像我"的颜色，最集中在「${tm.sub[0]} ${tm.sub[1]} ${SUBS[tm.season].e}」——${tm.sub[2]}。这只是一个参考坐标。${out?`你同样选择了「${esc(nameOf(out))}」——它不在这个季型里，但它也属于你。`:'再多试几组，看看你的边界在哪里。'}</p>`}
+function drape(){const cols=drapeColors();if(S.didx>=cols.length)S.didx=0;const[hex,name]=cols[S.didx]||['#d6d9d6','—'];const cs=curSet();const pk=store.picks.find(p=>p.hex===hex&&p.set===cs);
+  const sub=S.dset!=='art'?SUBS[S.dset].subs[S.dsub]:null;
+  return`${fitRoom()}
+  <h3 class="sec" style="margin-top:40px">参考坐标 · 16 型季型 <em>Reference, not rule</em></h3>
+  <p class="lede sm">四季 × 四个子型，按冷暖、深浅、清浊三个维度细分。在脸旁一次只看一种颜色，感受它让你更清晰，还是更疲惫——结果只是坐标，最终以你在试衣镜里的感受为准。</p>
+  <div class="sets">${[...Object.entries(SUBS).map(([k,v])=>[k,v.n,v.e]),['art','源','Muse']].map(([k,n,e])=>`<button class="${S.dset===k?'on':''}" data-a="dset" data-v="${k}"><b>${n}</b><span>${e}</span></button>`).join('')}</div>
+  ${sub?`<div class="subs">${Object.entries(SUBS[S.dset].subs).map(([k,v])=>`<button class="${S.dsub===k?'on':''}" data-a="dsub" data-v="${k}"><b>${v[0]}</b><span>${v[1]}</span></button>`).join('')}</div>`:''}
+  <p class="setdesc">${S.dset==='art'?(cols.length?'来自你最近解码的灵感':'先去灵感库解码一个灵感，它的颜色会出现在这里'):`${sub[0]} ${sub[1]} ${SUBS[S.dset].e} · ${sub[2]}`}</p>
+  <div class="mirror ${S.under?'tapmode':''}">${S.photo?`<canvas id="mc" width="600" height="680"></canvas>`:`<svg viewBox="0 0 300 340" class="ph" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="phg" cx=".5" cy=".38" r=".62"><stop offset="0" stop-color="#e8e5df"/><stop offset="1" stop-color="#cfccc5"/></radialGradient></defs><rect width="300" height="340" fill="#dde1de"/><rect x="128" y="190" width="44" height="70" fill="#d1cec7"/><ellipse cx="150" cy="138" rx="60" ry="76" fill="url(#phg)"/><text x="150" y="128" text-anchor="middle" font-size="10" fill="#8b9692" font-family="sans-serif">上传照片后在这里试披</text></svg>`}
+  <svg viewBox="0 0 300 340" class="drapesvg" preserveAspectRatio="none"><path d="M0 262Q70 226 118 236Q150 278 182 236Q230 226 300 262V340H0Z" fill="${hex}"/><path d="M0 262Q70 226 118 236Q150 278 182 236Q230 226 300 262" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/></svg>
+  ${S.under?'<p class="tiphint">在自然光下，轻点脸颊</p>':''}
+  <div class="swname" style="color:${textOn(hex)}"><b>${esc(name)}</b><span>${hex.toUpperCase()}</span></div>
+  ${cols.length>1?'<button class="nav l" data-a="dprev" aria-label="上一个">‹</button><button class="nav r" data-a="dnext" aria-label="下一个">›</button>':''}</div>
+  <div class="dots">${cols.map((c,i)=>{const p=store.picks.find(x=>x.hex===c[0]&&x.set===cs);return`<i class="${i===S.didx?'cur':''} ${p?(p.liked?'y':'n'):''}" style="background:${c[0]}" data-a="didx" data-v="${i}"></i>`}).join('')}</div>
+  <div class="feel big"><button class="${pk&&pk.liked?'on':''}" data-a="dpick" data-v="1">♡ 像我</button><button class="${pk&&!pk.liked?'on':''}" data-a="dpick" data-v="0">不太像我</button></div>
+  <div class="row"><button class="btn ghost sm" data-a="pickPhoto">${S.photo?'换一张照片':'上传一张自然光下的照片'}</button>${S.photo?`<button class="btn ghost sm ${S.under?'on':''}" data-a="under">${S.under?'取消取色':'估算肤色冷暖'}</button>`:''}</div>
+  ${S.underRes?`<div class="under"><b>${esc(S.underRes.t)}</b><span>${esc(S.underRes.d)}</span></div>`:''}
+  <p class="fine">各流派的子型命名略有差异（如"柔春""深春"），Mirari 以三维度坐标为准。</p>
+  <h3 class="sec">你的选择 <em>Your picks</em></h3>${summary()}`}
+
+function closet(){return`<p class="eyebrow">Smart Wardrobe · Price Watch</p><h2 class="h">${S.seg==='watch'?'想要的，等一等':'先穿你已有的'}</h2>
+  <div class="seg"><button class="${S.seg!=='watch'?'on':''}" data-a="seg" data-v="closet">衣橱 · ${WARDROBE.length}</button><button class="${S.seg==='watch'?'on':''}" data-a="seg" data-v="watch">蹲价 · ${store.watch.length}</button></div>
+  ${S.seg==='watch'?watch():wardrobe()}`}
+function wardrobe(){const old=WARDROBE.slice().sort((a,b)=>b.last-a.last)[0];const tw=WARDROBE.reduce((a,w)=>a+wearsOf(w),0),tp=WARDROBE.reduce((a,w)=>a+w.price,0);
+  return`<div class="nudge">「<b>${old.name}</b>」已经 <b>${old.last}</b> 天没穿了。今天试着用它，配一幅你喜欢的画？</div>
+  <div class="archive" style="margin-bottom:14px"><div class="stat"><b>¥${Math.round(tp/tw)}</b><span>平均单次穿着成本</span></div><div class="stat"><b>${tw}</b><span>次总穿着</span></div></div>
+  ${S.addPending?addPanel():`<button class="btn" style="width:100%;margin-bottom:12px" data-a="waddphoto">＋ 拍一件衣服入库</button>`}
+  <p class="fine" style="margin:0 0 12px">在纯色背景上平铺拍摄效果最好：自动抠图、识别主色。也可以点任意单品下方的「换实拍」。照片只存在这台设备上。</p>
+  <div class="wgrid">${WARDROBE.map(w=>`<div class="witem">${tile(w)}<b>${esc(w.name)}</b><span>穿 ${wearsOf(w)} 次 · 每次 ¥${Math.round(w.price/wearsOf(w))}</span><button class="wph-btn" data-a="wphoto" data-v="${esc(w.name)}">${store.photos[w.name]?'重拍':'换实拍'}</button></div>`).join('')}</div>
+  <p class="fine">演示衣橱的单品与价格为示例数据；换上实拍后，穿搭推荐、平铺图和衣橱匹配都会用这件真实的衣服。</p>`}
+function addPanel(){const a=S.addPending;return`<div class="addp"><div class="addp-img"><img src="${a.src}" alt="新单品"></div><div class="addp-f">
+  <p class="k">识别到的主色 <i style="background:${a.hex}"></i> ${a.hex.toUpperCase()}</p>
+  <div class="bchips">${Object.entries(SLOT).map(([k,v])=>`<button class="${a.slot===k?'on':''}" data-a="waddslot" data-v="${k}">${v}</button>`).join('')}</div>
+  <input id="waddname" value="${esc(a.name)}" maxlength="12" aria-label="单品名称">
+  <div class="row" style="margin-top:8px"><button class="btn sm" data-a="waddok">加入衣橱</button><button class="btn ghost sm" data-a="waddcancel">取消</button></div></div></div>`}
+async function processGarment(file){const img=await loadImg(file);const M=360,sc=Math.min(1,M/Math.max(img.naturalWidth,img.naturalHeight));const W=Math.max(1,Math.round(img.naturalWidth*sc)),H=Math.max(1,Math.round(img.naturalHeight*sc));
+  const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,W,H);const id=x.getImageData(0,0,W,H),d=id.data;
+  const lab=new Float32Array(W*H*3);for(let i=0;i<W*H;i++){const L=rgbToLab(d[i*4],d[i*4+1],d[i*4+2]);lab[i*3]=L[0];lab[i*3+1]=L[1];lab[i*3+2]=L[2]}
+  let m=[0,0,0],n=0;const border=[];for(let x0=0;x0<W;x0++){border.push(x0,(H-1)*W+x0)}for(let y0=0;y0<H;y0++){border.push(y0*W,y0*W+W-1)}border.forEach(i=>{m[0]+=lab[i*3];m[1]+=lab[i*3+1];m[2]+=lab[i*3+2];n++});m=m.map(v=>v/n);
+  const dist=i=>Math.hypot((lab[i*3]-m[0])*.5,lab[i*3+1]-m[1],lab[i*3+2]-m[2]);const bg=new Uint8Array(W*H),q=[];border.forEach(i=>{if(!bg[i]&&dist(i)<16){bg[i]=1;q.push(i)}});
+  while(q.length){const i=q.pop(),px=i%W,py=(i/W)|0;[[px-1,py],[px+1,py],[px,py-1],[px,py+1]].forEach(([a,b])=>{if(a<0||b<0||a>=W||b>=H)return;const k=b*W+a;if(!bg[k]&&dist(k)<16){bg[k]=1;q.push(k)}})}
+  const fg=W*H-bg.reduce((a,v)=>a+v,0);let cut=fg>W*H*.06&&fg<W*H*.97;let mnx=W,mny=H,mxx=0,mxy=0;
+  for(let i=0;i<W*H;i++){const px=i%W,py=(i/W)|0;if(cut&&bg[i]){d[i*4+3]=0;continue}if(cut){const nb=(px>0&&bg[i-1])||(px<W-1&&bg[i+1])||(py>0&&bg[i-W])||(py<H-1&&bg[i+W]);if(nb)d[i*4+3]=150}if(px<mnx)mnx=px;if(py<mny)mny=py;if(px>mxx)mxx=px;if(py>mxy)mxy=py}
+  x.putImageData(id,0,0);const cw=mxx-mnx+1,ch=mxy-mny+1;const o=document.createElement('canvas');o.width=cw;o.height=ch;o.getContext('2d').drawImage(c,mnx,mny,cw,ch,0,0,cw,ch);
+  let src=o.toDataURL('image/webp',.82);if(!src.startsWith('data:image/webp'))src=o.toDataURL('image/png');
+  const im2=await new Promise((res,rej)=>{const t=new Image();t.onload=()=>res(t);t.onerror=rej;t.src=src});const pal=extractPalette(im2,4).palette;const hex=(pal[0]||{hex:'#999999'}).hex;
+  return{src,hex,cut}}
+function savePhotos(){try{localStorage.setItem('mr.v2',JSON.stringify(store));return true}catch(e){toast('设备存储空间不足，这张照片只在本次打开时有效');return false}}
+function watch(){const mk=MARKETS[S.market];
+  return`<div class="markets">${Object.entries(MARKETS).map(([k,v])=>`<button class="${S.market===k?'on':''}" data-a="market" data-v="${k}">${k} ${v.sym} · ${v.n}</button>`).join('')}</div>
+  <p class="lede sm">把想要的单品放进来，Mirari 替你追踪价格。新加入的单品会进入冷静期——时长你来定；如果碰上了好价格，也可以提前结束。</p>
+  <div class="cooldef"><span>新单品默认冷静期</span>${COOLS.map(h=>`<button class="${(store.coolDefault??48)===h?'on':''}" data-a="cooldef" data-v="${h}">${h?h+'h':'不设'}</button>`).join('')}</div>
+  ${store.watch.map(w=>wcard(w,mk)).join('')||'<div class="empty" style="margin-top:12px">还没有蹲价单品。从「穿上这幅画」的衣橱缺口里添加。</div>'}
+  <p class="fine">价格与商家均为演示数据；正式版接入支持比价的合作商家。</p>`}
+const COOLS=[0,12,24,48,72];
+function wcard(w,mk){const cur=w.hist.at(-1),mn=Math.min(...w.hist),hit=cur<=w.target,low=cur<=mn*1.02;const ch=w.cool??48;const cool=w.ended?0:Math.max(0,ch*3600e3-(Date.now()-w.added));const own=WARDROBE.filter(x=>compat(x.slot,w.slot)&&dE(x.hex,w.hex)<28).length;
+  return`<div class="wcard"><button class="rm" data-a="rmw" data-id="${w.id}">移除</button><div class="wtop"><i style="background:${w.hex}"></i><div><b>${esc(w.name)}</b><span>${esc(w.shop)} · ${SLOT[w.slot]}</span></div>
+  <div class="price"><b>${fmt(cur,mk)}</b><span style="font-size:10.5px;display:block">${hit?'<em class="ok">已到目标价</em>':'距目标 '+fmt(cur-w.target,mk)}</span></div></div>
+  ${spark(w.hist,w.target)}<div class="wmeta"><span>30 天最低 ${fmt(mn,mk)}</span><span>目标价 ${fmt(w.target,mk)}</span></div>
+  <div class="tgt"><button data-a="tgt" data-id="${w.id}" data-v="-1">−</button><span>调整目标价</span><button data-a="tgt" data-id="${w.id}" data-v="1">＋</button></div>
+  <div class="coolrow"><span>冷静期</span>${COOLS.map(h=>`<button class="${ch===h&&!w.ended?'on':''}" data-a="coolset" data-id="${w.id}" data-v="${h}">${h?h+'h':'不设'}</button>`).join('')}</div>
+  ${cool>0&&(hit||low)?(S.confirmEnd===w.id?`<div class="endbox"><p>${low?'现在是 30 天最低价':'已经到了你的目标价'}。${own?`你已有 ${own} 件相近单品，`:''}确定现在就结束冷静期吗？</p><div class="row"><button class="btn sm" data-a="coolend" data-id="${w.id}">确定，现在决定</button><button class="btn ghost sm" data-a="coolkeep">再等等</button></div></div>`:`<button class="endbtn" data-a="coolask" data-id="${w.id}">${low?'30 天最低价':'已到目标价'} · 提前结束冷静期</button>`):''}
+  <div class="reflect">${ch===0&&!w.ended?'<span class="cool done">未设冷静期</span>':cool>0?`<span class="cool">冷静期 · 还剩 ${Math.ceil(cool/3600e3)} 小时</span>`:'<span class="cool done">冷静期已结束 · 可以决定了</span>'}<span>${own?'你已有 '+own+' 件相近单品':'衣橱里没有相近单品'}</span><span>按穿 30 次计 · 每次 ${fmt(cur/30,mk,1)}</span></div></div>`}
+
+
+/* ---------- Fit Room: color try-on on your own body ---------- */
+const FW=480,FH=640,SLOTI={outer:1,top:2,bottom:3,shoes:4,accent:5};
+S.fit={over:{},sub:null,body:'H',depth:0,src:'L0',photo:null,base:null,lab:null,manKey:'',mode:null,tol:16,wb:[1,1,1],temp:0,tint:0,bright:0,adj:{},sel:null,compare:false,aiBusy:false};
+const APPEAR={'spring-light':['#f3d5bd','#d2ad74','#e99a8a'],'spring-warm':['#e9bf98','#a5602d','#df8a6a'],'spring-bright':['#efc6a4','#4a2c1c','#ef6f61'],'spring-true':['#ecc4a0','#9a6a3a','#e8806a'],
+'summer-light':['#f2d8d0','#bba792','#e3a3ad'],'summer-cool':['#e7c6bb','#5a4a42','#c97a8e'],'summer-soft':['#dcbfae','#7a6656','#c48e92'],'summer-true':['#e5c4b6','#6a5446','#cc8494'],
+'autumn-deep':['#a8714e','#2e1a10','#9a4a3a'],'autumn-warm':['#c98f62','#6b3a1c','#b8603e'],'autumn-soft':['#d0a688','#8a6a4a','#c08a72'],'autumn-true':['#c08a62','#5a3418','#b05c40'],
+'winter-deep':['#7a4e36','#120d0b','#8a2a3a'],'winter-cool':['#e3c2b4','#1a1414','#b8405e'],'winter-bright':['#e8c5b0','#121010','#d61f5a'],'winter-true':['#b98b72','#151111','#a8304a']};
+const BODY={H:[52,42,50,'直筒 H'],X:[54,34,56,'沙漏 X'],A:[46,36,62,'梨形 A'],V:[62,42,46,'倒三角 V'],O:[56,54,60,'圆润 O']};
+const CELEBS={'summer-light':['Reese Witherspoon','Margot Robbie','Lili Reinhart','Sydney Sweeney','Jodie Comer'],'summer-soft':['Jennifer Aniston','Emilia Clarke','Zoe Saldaña','Joey King'],'summer-true':['Natalie Portman','Catherine, Princess of Wales','Olivia Wilde'],
+'spring-true':['Blake Lively','Amy Adams','Nicole Kidman'],'spring-bright':['Emma Stone','Brittany Snow'],'spring-light':['Goldie Hawn'],
+'autumn-deep':['Gemma Chan','Halle Berry','Freida Pinto','Eva Longoria','Oprah Winfrey'],'winter-bright':['Dua Lipa','Awkwafina','Olivia Munn','Camila Mendes','Megan Fox'],'winter-deep':['Penélope Cruz','Salma Hayek'],'winter-true':['Anne Hathaway','Lucy Liu']};
+function topSub(){const liked=store.picks.filter(p=>p.liked);if(!liked.length)return'summer-light';const sc={};liked.forEach(p=>{const st=setOf(p);sc[st]=(sc[st]||0)+1});return Object.keys(sc).sort((a,b)=>sc[b]-sc[a])[0]}
+function shiftL(hex,d){if(!d)return hex;const[L,A,B]=rgbToLab(...hexToRgb(hex));return rgbToHex(...labToRgb(Math.max(8,Math.min(95,L-d*.6)),A+d*.05,B+d*.08))}
+function fitOptions(){const o=sceneLooks().map((lk,i)=>({id:'L'+i,label:lk.t,pieces:adapt(lk,WX[S.wx].k).pieces}));if(S.result)o.unshift({id:'muse',label:'灵感 · '+S.result.title,pieces:S.result.pieces});return o}
+function fitCur(){const o=fitOptions();const c=o.find(x=>x.id===S.fit.src)||o[0];const ov=S.fit.over;return{...c,pieces:c.pieces.map(p=>ov[p.slot]?{...p,hex:ov[p.slot],name:nameColor(ov[p.slot])+SLOT[p.slot]+'（换色）'}:p)}}
+function labToRgb(L,a,b){let y=(L+16)/116,x=a/500+y,z=y-b/200;const f=t=>{const t3=t*t*t;return t3>.008856?t3:(t-16/116)/7.787};x=f(x)*.95047;y=f(y);z=f(z)*1.08883;const r=x*3.2406+y*-1.5372+z*-.4986,g=x*-.9689+y*1.8758+z*.0415,bl=x*.0557+y*-.204+z*1.057;const c=v=>255*(v>.0031308?1.055*Math.pow(v,1/2.4)-.055:12.92*v);return[c(r),c(g),c(bl)].map(v=>Math.max(0,Math.min(255,v)))}
+function adjHex(hex,a){if(!a||(!a.l&&!a.w&&!a.s))return hex;const[L,A,B]=rgbToLab(...hexToRgb(hex));const k=1+(a.s||0)/50;return rgbToHex(...labToRgb(Math.max(2,Math.min(98,L+(a.l||0)*.7)),A*k+(a.w||0)*.15,B*k+(a.w||0)*.55))}
+function buildMannequin(pieces){const F=S.fit,ap=APPEAR[F.sub],B=BODY[F.body],cx=240,sw=B[0],ww=B[1],hw=B[2];const c=document.createElement('canvas');c.width=FW;c.height=FH;const x=c.getContext('2d');
+  const bg=x.createLinearGradient(0,0,0,FH);bg.addColorStop(0,'#eef0ed');bg.addColorStop(.86,'#e3e6e2');bg.addColorStop(.86,'#d8dbd6');bg.addColorStop(1,'#d0d3ce');x.fillStyle=bg;x.fillRect(0,0,FW,FH);
+  x.fillStyle='rgba(0,0,0,.08)';x.beginPath();x.ellipse(cx,586,hw+70,14,0,0,7);x.fill();
+  const skin=shiftL(ap[0],F.depth);x.fillStyle=skin;x.beginPath();x.ellipse(cx,98,32,40,0,0,7);x.fill();x.fillRect(cx-11,128,22,36);
+  x.beginPath();x.ellipse(cx-sw-14,342,10,13,0,0,7);x.ellipse(cx+sw+14,342,10,13,0,0,7);x.fill();
+  x.fillStyle=ap[1];x.beginPath();x.moveTo(cx-36,100);x.quadraticCurveTo(cx-36,52,cx,52);x.quadraticCurveTo(cx+38,52,cx+37,104);x.quadraticCurveTo(cx+44,150,cx+28,170);x.lineTo(cx+26,104);x.quadraticCurveTo(cx+10,78,cx-26,96);x.lineTo(cx-28,170);x.quadraticCurveTo(cx-42,150,cx-36,100);x.fill();
+  x.fillStyle='rgba(40,32,30,.75)';x.beginPath();x.ellipse(cx-11,102,2.6,2,0,0,7);x.ellipse(cx+11,102,2.6,2,0,0,7);x.fill();x.fillStyle=ap[2];x.beginPath();x.ellipse(cx,121,7,2.6,0,0,7);x.fill();
+  const has=new Set(pieces.map(p=>p.slot)),wb=ww+6,cw=Math.max(hw,sw-8)+12,hmw=Math.max(ww+4,(ww+hw)/2);
+  const sh=[['bottom',`M${cx-wb} 326L${cx+wb} 326Q${cx+hw+2} 356 ${cx+hw} 392L${cx+hw-8} 562L${cx+12} 562L${cx} 394L${cx-12} 562L${cx-hw+8} 562L${cx-hw} 392Q${cx-hw-2} 356 ${cx-wb} 326Z`]];
+  if(has.has('outer')){sh.push(['outer',`M${cx-sw+4} 154Q${cx} 166 ${cx+sw-4} 154L${cx+sw+14} 170L${cx+sw+28} 330L${cx+sw+2} 334L${cx+sw-6} 250L${cx+cw} 472L${cx-cw} 472L${cx-sw+6} 250L${cx-sw-2} 334L${cx-sw-28} 330L${cx-sw-14} 170Z`]);sh.push(['top',`M${cx-20} 166Q${cx} 177 ${cx+20} 166L${cx+24} 472L${cx-24} 472Z`])}
+  else sh.push(['top',`M${cx-sw+4} 158Q${cx} 172 ${cx+sw-4} 158L${cx+sw+14} 172L${cx+sw+26} 322L${cx+sw+2} 326L${cx+sw-8} 222L${cx+ww+2} 300L${cx+hmw} 338L${cx-hmw} 338L${cx-ww-2} 300L${cx-sw+8} 222L${cx-sw-2} 326L${cx-sw-26} 322L${cx-sw-14} 172Z`]);
+  const shoe=xl=>`M${xl-26} 566Q${xl-26} 552 ${xl-12} 552L${xl+14} 552Q${xl+28} 556 ${xl+28} 568Q${xl+28} 580 ${xl+16} 580L${xl-18} 580Q${xl-26} 580 ${xl-26} 566Z`;const lx=(hw+4)/2;
+  sh.push(['shoes',shoe(cx-lx)+shoe(cx+lx)]);
+  if(has.has('accent')){const x0=cx+sw+4;sh.push(['accent',`M${x0} 334Q${x0} 326 ${x0+8} 326L${x0+44} 326Q${x0+52} 326 ${x0+52} 334L${x0+54} 374Q${x0+54} 380 ${x0+48} 380L${x0+4} 380Q${x0-2} 380 ${x0-2} 374Z`])}
+  const lab=new Uint8Array(FW*FH);
+  sh.forEach(([slot,d])=>{const p=new Path2D(d);const g=x.createLinearGradient(cx-110,0,cx+110,0);g.addColorStop(0,'#d8d8d6');g.addColorStop(.45,'#c0c0be');g.addColorStop(1,'#8e8e8c');x.fillStyle=g;x.fill(p);x.strokeStyle='rgba(0,0,0,.14)';x.lineWidth=1;x.stroke(p);
+    const m=document.createElement('canvas');m.width=FW;m.height=FH;const mx=m.getContext('2d');mx.fillStyle='#fff';mx.fill(p);const md=mx.getImageData(0,0,FW,FH).data;const id=SLOTI[slot];for(let i=0;i<lab.length;i++)if(md[i*4+3]>127)lab[i]=id});
+  x.strokeStyle='rgba(0,0,0,.12)';x.lineWidth=1.4;x.beginPath();x.moveTo(cx,400);x.lineTo(cx,556);x.stroke();
+  return{img:x.getImageData(0,0,FW,FH),lab}}
+function ensureBase(){const F=S.fit;if(F.photo){if(!F.base){const c=document.createElement('canvas');c.width=FW;c.height=FH;const x=c.getContext('2d');const im=F.photo;const sc=Math.max(FW/im.naturalWidth,FH/im.naturalHeight);const w=im.naturalWidth*sc,h=im.naturalHeight*sc;x.drawImage(im,(FW-w)/2,(FH-h)/2,w,h);F.base=x.getImageData(0,0,FW,FH);F.lab=new Uint8Array(FW*FH)}}
+  else{if(!F.sub)F.sub=topSub();const key=fitCur().pieces.map(p=>p.slot).join()+F.sub+F.body+F.depth;if(!F.base||F.manKey!==key){const m=buildMannequin(fitCur().pieces);F.base=m.img;F.lab=m.lab;F.manKey=key}}}
+function drawFit(){const c=document.getElementById('fitc');if(!c)return;ensureBase();const F=S.fit,src=F.base.data,out=new ImageData(FW,FH),o=out.data;
+  const g=[F.wb[0]*(1+F.temp/250),F.wb[1]*(1-F.tint/300),F.wb[2]*(1-F.temp/250)],br=F.bright*1.2;const tgt={};fitCur().pieces.forEach(p=>{tgt[SLOTI[p.slot]]=hexToRgb(adjHex(p.hex,F.adj[p.slot]))});
+  const sum=new Float64Array(6),cnt=new Uint32Array(6);for(let i=0,j=0;i<F.lab.length;i++,j+=4){const l=F.lab[i];if(l){sum[l]+=src[j]*.3+src[j+1]*.59+src[j+2]*.11;cnt[l]++}}
+  for(let i=0,j=0;i<F.lab.length;i++,j+=4){const l=F.lab[i];
+    if(l&&tgt[l]&&!F.compare){const k=Math.pow((src[j]*.3+src[j+1]*.59+src[j+2]*.11)/((sum[l]/cnt[l])||1),.85),t=tgt[l];o[j]=t[0]*k;o[j+1]=t[1]*k;o[j+2]=t[2]*k}
+    else{o[j]=src[j]*g[0]+br;o[j+1]=src[j+1]*g[1]+br;o[j+2]=src[j+2]*g[2]+br}o[j+3]=255}
+  c.getContext('2d').putImageData(out,0,0)}
+function floodAdd(px,py,slot){const F=S.fit,d=F.base.data,W=FW,H=FH,start=py*W+px;const lab=i=>rgbToLab(d[i*4],d[i*4+1],d[i*4+2]);const sd=lab(start);
+  const vis=new Uint8Array(W*H),q=new Int32Array(W*H);let h=0,t=0,n=0;q[t++]=start;vis[start]=1;const id=SLOTI[slot],tol=F.tol;
+  while(h<t){const i=q[h++];F.lab[i]=id;n++;const x=i%W,y=(i/W)|0;const nb=[x>0?i-1:-1,x<W-1?i+1:-1,y>0?i-W:-1,y<H-1?i+W:-1];
+    for(const k of nb){if(k<0||vis[k])continue;vis[k]=1;const c=lab(k);if(Math.hypot((c[0]-sd[0])*.45,c[1]-sd[1],c[2]-sd[2])<tol)q[t++]=k}}
+  return n}
+function fitTap(e){const c=e.target,r=c.getBoundingClientRect(),F=S.fit;const px=Math.max(0,Math.min(FW-1,Math.round((e.clientX-r.left)/r.width*FW))),py=Math.max(0,Math.min(FH-1,Math.round((e.clientY-r.top)/r.height*FH)));
+  if(F.mode==='wb'){const d=F.base.data;let s=[0,0,0],n=0;for(let y=py-5;y<=py+5;y++)for(let x=px-5;x<=px+5;x++){if(x<0||y<0||x>=FW||y>=FH)continue;const j=(y*FW+x)*4;s[0]+=d[j];s[1]+=d[j+1];s[2]+=d[j+2];n++}s=s.map(v=>v/n);const m=(s[0]+s[1]+s[2])/3;
+    if(m<60){toast('这里太暗了，换一个白色的地方');return}F.wb=s.map(v=>Math.max(.6,Math.min(1.6,m/v)));F.temp=F.tint=0;F.mode=null;toast('已按白色物体校准');stay();return}
+  if(!F.photo){toast('上传全身照后，就能标记你自己的衣服');return}
+  const prev=F.lab.slice();const n=floodAdd(px,py,F.mode);if(n>FW*FH*.55){F.lab=prev;toast('范围太大了，试着调小"识别范围"')}else if(n<150)toast('区域太小，换个位置或调大识别范围');else toast('已标记 · 可以继续点来补充');stay()}
+async function fitAI(){const F=S.fit;if(!sampleFn||F.aiBusy||!F.photo)return;F.aiBusy=true;stay();
+  try{const c=document.createElement('canvas');c.width=FW;c.height=FH;c.getContext('2d').putImageData(F.base,0,0);const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.85));
+    const prompt='这是一张人物全身照。请在此人身上每一类衣物上，各找一个颜色有代表性、不在阴影或图案上的点，给出相对坐标（x、y 都在 0 到 1 之间，原点在左上角）。只输出 JSON：{"outer":[x,y]或null,"top":[x,y]或null,"bottom":[x,y]或null,"shoes":[x,y]或null}。outer 指最外层的外套；如果只穿了一件上衣，outer 为 null。';
+    let out;if(typeof sampleFn.json==='function')out=await sampleFn.json(prompt,{images:[blob],modelTier:'default'});else{const r=await sampleFn(prompt,{images:[blob],modelTier:'default'});out=JSON.parse(r.text.match(/\{[\s\S]*\}/)[0])}
+    let k=0;['outer','top','bottom','shoes'].forEach(sl=>{const p=out&&out[sl];if(Array.isArray(p)&&p.length===2&&p.every(v=>typeof v==='number'&&v>=0&&v<=1)){const prev=F.lab.slice();const n=floodAdd(Math.round(p[0]*(FW-1)),Math.round(p[1]*(FH-1)),sl);if(n>FW*FH*.55||n<80)F.lab=prev;else k++}});
+    toast(k?`AI 识别了 ${k} 类衣物 · 可以手动补充`:'没有识别到衣物，试试手动标记')}
+  catch(e){if(e&&e.code==='not_granted'){sampleFn=null;setPill()}toast('AI 识别没有成功，请手动标记')}finally{F.aiBusy=false;stay()}}
+function modelPanel(){const F=S.fit;if(!F.sub)F.sub=topSub();
+  return`<div class="model"><div class="mrow"><span>季型</span><select id="subSel">${Object.entries(SUBS).map(([k,v])=>`<optgroup label="${v.n} ${v.e}">${Object.entries(v.subs).map(([sk,sv])=>`<option value="${k}-${sk}" ${F.sub===k+'-'+sk?'selected':''}>${sv[0]} · ${sv[1]} ${v.e}</option>`).join('')}</optgroup>`).join('')}</select></div>
+  <div class="mrow"><span>身形</span><div class="bchips">${Object.entries(BODY).map(([k,v])=>`<button class="${F.body===k?'on':''}" data-a="fbody" data-v="${k}">${v[3]}</button>`).join('')}</div></div>
+  ${slider('depth','肤色','更浅','更深',F.depth)}
+  <p class="fine" style="margin-top:6px">模特的肤色、发色、唇色会跟着季型变化；身形只用来描述，不做评判。同一个季型里，肤色可深可浅。</p></div>`}
+function subSwatches(sel){const F=S.fit;const sub=F.sub||topSub();const m=subMeta(sub);
+  return`<div class="swrow"><p>${m.sub[0]} · ${m.sub[1]} ${SUBS[m.season].e} 参考色 <em>点一下，换到「${SLOT[sel]}」</em>${Object.keys(F.over).length?' <a data-a="fresetover">恢复原色</a>':''}</p><div>${m.sub[3].map(c=>`<i data-a="fover" data-v="${c[0]}" style="background:${c[0]}" title="${c[1]}"></i>`).join('')}</div></div>`}
+function celebBlock(){const sub=S.fit.sub||topSub();const m=subMeta(sub);const list=CELEBS[sub]||[];
+  return`<h3 class="sec">同季型参考 <em>${m.sub[1]} ${SUBS[m.season].e}</em></h3>
+  ${list.length?`<div class="celebs">${list.map(n=>`<a href="https://www.pinterest.com/search/pins/?q=${encodeURIComponent(n+' outfit')}" target="_blank" rel="noopener"><b>${esc(n)}</b><span>近期造型 ↗</span></a>`).join('')}</div>
+  <p class="fine">名单来自公开的色彩分析文章；不同顾问的判断常常不一致，只作参考。正式版将通过授权图库与签约的同季型穿搭博主，展示她们的近期穿搭。</p>`
+  :`<div class="empty">这个子型的参考人物还在整理中。正式版将由合作色彩顾问标注，并签约同季型的穿搭博主。</div>`}`}
+function slider(k,label,lo,hi,v,grp,min=-40,max=40){return`<label class="sl"><span>${label}</span><small>${lo}</small><input type="range" min="${min}" max="${max}" value="${v||0}" data-k="${k}" ${grp?`data-g="${grp}"`:''}><small>${hi}</small></label>`}
+function fitRoom(){const F=S.fit,cur=fitCur(),opts=fitOptions();if(!cur.pieces.find(p=>p.slot===F.sel))F.sel=cur.pieces[0].slot;const sel=F.sel,sp=cur.pieces.find(p=>p.slot===sel),a=F.adj[sel]||{};
+  const marks=cur.pieces.filter(p=>p.slot!=='accent').map(p=>p.slot);const done=sl=>F.photo&&F.lab&&F.lab.includes(SLOTI[sl]);
+  return`<p class="eyebrow">Fit Room · AI Try-on</p><h2 class="h">适合你的，才最重要</h2>
+  <div class="manifesto"><p>季型告诉你哪些颜色<b>理论上</b>适合你；</p><p>试衣镜让你看见这一整套穿在<b>你身上</b>的样子；</p><p>最后由你决定：<b>喜欢吗？</b></p></div>
+  <div class="chips" style="margin-top:4px">${opts.map(o=>`<button class="${o.id===cur.id?'on':''}" data-a="fitsrc" data-v="${o.id}">${esc(o.label)}</button>`).join('')}</div>
+  ${!F.photo?modelPanel():''}
+  <div class="fitwrap ${F.mode?'tapmode':''}"><canvas id="fitc" width="${FW}" height="${FH}"></canvas>
+  ${F.mode?`<p class="fithint">${F.mode==='wb'?'点一下照片里白色的东西：白墙、白纸、白 T 恤':'点一下你身上的「'+SLOT[F.mode]+'」，可以多点几处补充'}</p>`:''}
+  ${!F.photo?'<span class="demo-tag">演示模特 · 上传全身照，换成你自己</span>':''}
+  <button class="cmp" data-a="cmp">${F.compare?'看试穿效果':'对比原图'}</button></div>
+  ${subSwatches(sel)}
+  <div class="row"><button class="btn ${F.photo?'ghost':''} sm" data-a="pickBody">${F.photo?'换一张全身照':'上传一张全身照'}</button>${F.photo&&sampleFn?`<button class="btn sm on" data-a="fitAI" ${F.aiBusy?'disabled':''}>${F.aiBusy?'识别中…':'✦ AI 自动识别衣服'}</button>`:''}</div>
+  ${F.photo?`<div class="markrow"><span>手动标记</span>${marks.map(sl=>`<button class="${F.mode===sl?'on':''} ${done(sl)?'done':''}" data-a="fmark" data-v="${sl}">${done(sl)?'✓ ':''}${SLOT[sl]}</button>`).join('')}${F.mode&&F.mode!=='wb'?'<button data-a="fmark" data-v="">完成</button>':''}<button data-a="fclear">清除</button></div>
+  ${slider('tol','识别范围','小','大',F.tol,'',8,40)}`:''}
+  ${celebBlock()}
+  <h3 class="sec">颜色和肉眼看到的不一样？ <em>Calibrate</em></h3>
+  <p class="lede sm">手机照片常常偏黄、偏蓝或偏暗。先把照片校准到接近你在镜子里看到的样子，再判断这套颜色适不适合你。</p>
+  <div class="row" style="margin-top:8px"><button class="btn ghost sm ${F.mode==='wb'?'on':''}" data-a="fmark" data-v="wb">点白色物体 · 自动校准</button><button class="btn ghost sm" data-a="wbreset">重置</button></div>
+  ${slider('temp','色温','偏蓝','偏黄',F.temp)}${slider('tint','色调','偏绿','偏紫',F.tint)}${slider('bright','亮度','更暗','更亮',F.bright)}
+  <h3 class="sec">微调这套颜色 <em>Fine-tune</em></h3>
+  <div class="pchips">${cur.pieces.map(p=>`<button class="${p.slot===sel?'on':''}" data-a="fsel" data-v="${p.slot}"><i style="background:${adjHex(p.hex,F.adj[p.slot])}"></i>${SLOT[p.slot]}</button>`).join('')}</div>
+  <p class="adjname"><b>${esc(sp.name)}</b><span id="adjhex">${adjHex(sp.hex,a).toUpperCase()}</span></p>
+  ${slider('l','明暗','更深','更浅',a.l,'adj')}${slider('w','冷暖','更冷','更暖',a.w,'adj')}${slider('s','鲜艳度','更灰','更鲜',a.s,'adj')}
+  <div class="feel big"><button class="${store.feels['fit:'+cur.label]==='yes'?'on':''}" data-a="fitfeel" data-v="yes">♡ 这套像我</button><button class="${store.feels['fit:'+cur.label]==='no'?'on':''}" data-a="fitfeel" data-v="no">不太像我</button></div>
+  <button class="btn" style="width:100%;margin-top:10px" data-a="fitsave">把调好的这套记进今天的穿搭日志</button>
+  <p class="fine">照片默认只在你的设备上处理；只有点「AI 自动识别」时才会发送给 AI 定位衣物，不会保存。原型为色彩试穿，正式版将接入生成式虚拟试穿，可以换款式与廓形。</p>`}
+
+
+/* ---------- OOTD diary ---------- */
+const dk=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+store.diary=store.diary||{};S.calM=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+if(!store.diarySeeded){const t=new Date();const L=(sc,i)=>{const lk=SCENES[sc].looks[i];return{title:lk.t,pieces:adapt(lk,'rain').pieces}};
+  [[2,'office',0,'第一次在周会上主动讲方案，风衣口袋刚好放下讲稿。'],[4,'gallery',0,'去看了莫奈特展，在睡莲前站了很久。原来我穿的颜色就在画里。'],[5,'date',1,'和朋友吃了很久的晚饭，聊到地铁末班车。'],[8,'concert',2,'演唱会！丝巾挥到了最后一首歌。']].forEach(([o,sc,i,st])=>{const d=new Date(t.getFullYear(),t.getMonth(),t.getDate()-o);store.diary[dk(d)]={type:'look',look:L(sc,i),story:st,scene:SCENES[sc].zh,demo:true}});
+  store.diarySeeded=true;try{localStorage.setItem('mr.v2',JSON.stringify(store))}catch(e){}}
+function dthumb(e){if(!e)return'';if(e.type==='photo'&&e.src)return`<img src="${e.src}" alt="">`;if(e.type==='look'&&e.look){const ps=e.look.pieces;return`<span class="dlook">${ps.slice(0,4).map(p=>`<i style="background:${p.hex}"></i>`).join('')}</span>`}return'<span class="dtext">✎</span>'}
+function diarySection(){const m=S.calM,y=m.getFullYear(),mo=m.getMonth();const first=(new Date(y,mo,1).getDay()+6)%7,days=new Date(y,mo+1,0).getDate();const today=dk(new Date());
+  const cells=[];for(let i=0;i<first;i++)cells.push('<span class="dcell blank"></span>');
+  for(let d=1;d<=days;d++){const k=dk(new Date(y,mo,d));const e=store.diary[k];const fut=k>today;cells.push(`<button class="dcell ${e?'has':''} ${k===today?'today':''} ${fut?'future':''}" data-a="dday" data-v="${k}" aria-label="${mo+1}月${d}日${e?'，已记录':''}">${dthumb(e)}<b>${d}</b></button>`)}
+  const n=Object.keys(store.diary).filter(k=>k.startsWith(`${y}-${String(mo+1).padStart(2,'0')}`)).length;
+  return`<section class="hsec"><p class="eyebrow">OOTD Diary · 已记录 ${n} 天</p><h2 class="h">我的穿搭日志</h2>
+  <div class="hcard"><div class="dhead"><button data-a="dmonth" data-v="-1" aria-label="上个月">‹</button><b>${y} 年 ${mo+1} 月</b><span></span><button data-a="dmonth" data-v="1" aria-label="下个月">›</button></div>
+  <div class="dweek">${'一二三四五六日'.split('').map(w=>`<span>${w}</span>`).join('')}</div>
+  <div class="dgrid">${cells.join('')}</div>
+  <p class="fine" style="margin-top:10px">点任意一天：上传照片，或选一套搭好的，再写下这一天的故事。</p></div></section>`}
+function diaryModal(){const k=S.diaryOpen,d=S.draft||{};const dt=new Date(k+'T00:00');const lbl=dt.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'short'});
+  const prev=d.type==='photo'&&d.src?`<img src="${d.src}" alt="当天穿搭照片">`:d.type==='look'&&d.look?`${flatlay(d.look.pieces)}<span class="dlt">${esc(d.look.title)}</span>`:`<div class="dempty">还没有选择照片或搭配</div>`;
+  return`<div class="dmask" data-a="dclose"></div><div class="dsheet" role="dialog" aria-label="${lbl} 的穿搭日志">
+  <div class="dsh"><b>${lbl}</b>${d.demo?'<em>示例</em>':''}${d.scene?`<span>${esc(d.scene)}${d.wx?' · '+esc(d.wx):''}</span>`:''}<button data-a="dclose" aria-label="关闭">×</button></div>
+  <div class="dprev">${prev}</div>
+  <div class="row"><button class="btn ghost sm" data-a="dphoto">上传照片</button><button class="btn ghost sm ${S.pickLook?'on':''}" data-a="dpicklook">选一套搭配</button></div>
+  ${S.pickLook?`<div class="dpick">${fitOptions().map(o=>`<button data-a="dchoose" data-v="${o.id}"><span class="dlook">${o.pieces.slice(0,4).map(p=>`<i style="background:${p.hex}"></i>`).join('')}</span>${esc(o.label)}</button>`).join('')}</div>`:''}
+  <textarea id="storyIn" maxlength="200" placeholder="今天穿这套，发生了什么故事？">${esc(d.story||'')}</textarea>
+  <div class="tagrow"><span>@ 朋友</span>${FRIENDS.map(f=>`<button class="${(d.tags||[]).includes(f.id)?'on':''}" data-a="dtag" data-v="${f.id}"><i style="background:${f.c}">${f.n[0]}</i>${f.n}</button>`).join('')}</div>
+  <label class="sharetog"><input type="checkbox" id="shareIn" ${d.share?'checked':''}> 分享到我的小圈子</label>
+  <div class="row"><button class="btn" data-a="dsave">保存</button>${store.diary[k]?'<button class="btn ghost" data-a="ddel">删除</button>':''}</div></div>`}
+
+
+/* ---------- Circle: a small, private community (no likes, no follower counts) ---------- */
+const FRIENDS=[{id:'mia',n:'Mia',c:'#c9a0b4'},{id:'lin',n:'小林',c:'#8fa6c0'},{id:'tao',n:'阿桃',c:'#d4a373'},{id:'sofia',n:'Sofia',c:'#9db7a5'}];
+const FR=id=>FRIENDS.find(f=>f.id===id)||{n:'你',c:'#1b2321'};
+store.circle=store.circle||null;
+if(!store.circle){const t=new Date();const ago=n=>dk(new Date(t.getFullYear(),t.getMonth(),t.getDate()-n));const L=(sc,i)=>{const lk=SCENES[sc].looks[i];return{title:lk.t,pieces:adapt(lk,'rain').pieces}};
+  store.circle={posts:[{id:'p1',who:'mia',date:ago(1),look:L('career',2),story:'明天去招聘会，借了你上次说的「雾蓝 + 薰衣草」那条规律。@你 帮我看看像不像我？',tags:['you'],react:null,comments:[]},
+   {id:'p2',who:'tao',date:ago(3),look:L('gallery',0),story:'和 @小林 一起去看展，我们俩都穿了莫奈色，像约好的一样。',tags:['lin'],react:null,comments:[{who:'lin',t:'下次换哈默修伊的灰！'}]},
+   {id:'p3',who:'sofia',date:ago(6),look:L('date',0),story:'Wore the green cardigan my mom gave me. Felt like myself today.',tags:[],react:null,comments:[]}],
+   chat:[{who:'lin',t:'周六演唱会穿什么？'},{who:'tao',t:'我想试试「应援色」那套，丝巾当应援物'},{who:'mia',t:'+1，我们一起穿同一个色系吧'}],demo:true};
+  try{localStorage.setItem('mr.v2',JSON.stringify(store))}catch(e){}}
+const REACTS=[['like','这很像你'],['borrow','借走这条规律'],['ask','想问怎么搭']];
+function postCard(p){const f=p.who==='me'?{n:'你',c:'#1b2321'}:FR(p.who);const dt=new Date(p.date+'T00:00').toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'});
+  const story=esc(p.story).replace(/@(你|Mia|小林|阿桃|Sofia)/g,'<b class="at">@$1</b>');
+  return`<article class="hcard post"><div class="ph"><i class="av" style="background:${f.c}">${f.n[0]}</i><b>${f.n}</b><span>${dt}${p.look?' · '+esc(p.look.title):''}</span></div>
+  ${p.src?`<div class="pimg"><img src="${p.src}" alt=""></div>`:p.look?`<div class="pflat">${flatlay(p.look.pieces)}</div>`:''}
+  <p class="pst">${story}</p>
+  <div class="react">${REACTS.map(([k,t])=>`<button class="${p.react===k?'on':''}" data-a="preact" data-id="${p.id}" data-v="${k}">${t}</button>`).join('')}</div>
+  ${p.react?`<p class="rnote">只有${p.who==='me'?'你自己':f.n}能看到你的回应，没有公开计数。</p>`:''}
+  ${(p.comments||[]).map(c=>`<p class="cmt"><b>${c.who==='me'?'你':FR(c.who).n}</b>${esc(c.t)}</p>`).join('')}
+  <form class="cform" data-pid="${p.id}"><input placeholder="写一句回应…" maxlength="80" aria-label="回应"><button class="btn sm">发送</button></form></article>`}
+function circle(){const C=store.circle;const posts=[...C.posts].sort((a,b)=>b.date.localeCompare(a.date));
+  return`<section class="hsec" style="margin-top:6px"><p class="eyebrow">Circle · 只有你邀请的朋友</p><h2 class="h">我的小圈子</h2>
+  <div class="hcard"><div class="friends">${FRIENDS.map(f=>`<span class="fr"><i class="av" style="background:${f.c}">${f.n[0]}</i>${f.n}</span>`).join('')}<button class="fr add" data-a="invite"><i class="av">＋</i>邀请</button></div>
+  ${S.invite?`<div class="inv"><p>把这个链接发给朋友，她打开后就能加入你的小圈子：</p><code>${esc(location.href.split('#')[0])}#invite-violet</code><div class="row"><button class="btn sm" data-a="copyinv">复制链接</button><button class="btn ghost sm" data-a="invite">收起</button></div></div>`:''}
+  <ul class="rules"><li>没有点赞数，没有粉丝数</li><li>最多 12 位朋友，内容不公开</li></ul></div></section>
+  <section class="hsec"><p class="eyebrow">Shared OOTD · 朋友分享的穿搭</p><h2 class="h">最近的穿搭</h2>${posts.map(postCard).join('')}</section>
+  <section class="hsec"><p class="eyebrow">Group chat · 4 位朋友</p><h2 class="h">群聊</h2>
+  <div class="hcard chat"><div class="msgs">${C.chat.map(m=>`<div class="msg ${m.who==='me'?'me':''}">${m.who==='me'?'':`<i class="av" style="background:${FR(m.who).c}">${FR(m.who).n[0]}</i>`}<div>${m.who==='me'?'':`<b>${FR(m.who).n}</b>`}${m.look?`<div class="mlook">${flatlay(m.look.pieces)}<span>${esc(m.look.title)}</span></div>`:''}${m.t?`<p>${esc(m.t)}</p>`:''}</div></div>`).join('')}</div>
+  <div class="row"><button class="btn ghost sm" data-a="chatlook">分享今天的搭配</button></div>
+  <form class="cform" id="chatform"><input id="chatIn" placeholder="发消息…" maxlength="120" aria-label="群聊消息"><button class="btn sm">发送</button></form></div></section>
+  ${C.demo?'<p class="fine">朋友、帖子和群聊为演示内容。正式版的消息只在受邀朋友之间同步。</p>':''}`}
+
+/* ---------- render & actions ---------- */
+function render(keep){const md=$('#modal');if(md)md.innerHTML=S.diaryOpen?diaryModal():'';const m=$('#main');const st=keep?m.scrollTop:0;m.innerHTML={home,art,drape,closet,circle}[S.tab]();m.scrollTop=st;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.t===S.tab));if(S.tab==='drape'){drawMirror();drawFit()}}
+const go=()=>render(false),stay=()=>render(true);
+let tt;function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2200)}
+function loadImg(f){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>res(img);img.onerror=rej;img.src=URL.createObjectURL(f)})}
+function downscale(img,max=768){const sc=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*sc);c.height=Math.round(img.naturalHeight*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/jpeg',.86))}
+function drawMirror(){const c=document.getElementById('mc');if(!c||!S.photo)return;const x=c.getContext('2d',{willReadFrequently:true});const iw=S.photo.naturalWidth,ih=S.photo.naturalHeight;const sc=Math.max(c.width/iw,c.height/ih);const w=iw*sc,h=ih*sc;x.drawImage(S.photo,(c.width-w)/2,(c.height-h)/2,w,h)}
+function sampleSkin(e){const c=e.target;const r=c.getBoundingClientRect();const px=Math.round((e.clientX-r.left)/r.width*c.width),py=Math.round((e.clientY-r.top)/r.height*c.height);
+  const d=c.getContext('2d').getImageData(Math.max(0,px-8),Math.max(0,py-8),16,16).data;let R=0,G=0,B=0,n=0;for(let i=0;i<d.length;i+=4){R+=d[i];G+=d[i+1];B+=d[i+2];n++}R/=n;G/=n;B/=n;
+  const[L,a,b]=rgbToLab(R,G,B);const hex=rgbToHex(R,G,B);const chroma=Math.hypot(a,b);const hue=Math.atan2(b,a)*180/Math.PI;
+  if(chroma<6||a<1||hue<15||hue>95){S.underRes={t:'这个位置看起来不像肤色',d:`取样色 ${hex.toUpperCase()}。换到脸颊中部、避开阴影和头发再试一次。`}}
+  else{const t=hue>60?'偏暖（黄调）':hue<48?'偏冷（粉调）':'中性';const dep=L>68?'浅':L>52?'中等':'深';
+    S.underRes={t:`${t} · 明度${dep}`,d:`取样色 ${hex.toUpperCase()}，色相角 ${hue.toFixed(0)}°。灯光、滤镜和妆容都会影响结果——它是一个起点，不是结论。`}}
+  S.under=false;stay()}
+function addWatch(i){const p=S.result.pieces[i];if(store.watch.some(w=>w.name===p.name))return;const hist=genHist(hash(p.name),BASE[p.slot]);
+  const cd=store.coolDefault??48;store.watch.push({id:'w'+Date.now(),name:p.name,hex:p.hex,slot:p.slot,shop:'示例商家 C',hist,target:Math.round(Math.min(...hist)*.95/10)*10,added:Date.now(),cool:cd});save();toast(cd?`已加入蹲价，进入 ${cd} 小时冷静期`:'已加入蹲价')}
+async function aiRead(){if(!sampleFn||S.aiBusy||!S.upload)return;S.aiBusy=true;stay();
+  const local=S.result;const hint=local.palette.map(c=>c.hex).join(', ');
+  const prompt=`你是「Mirari 照见」的艺术美育与穿搭顾问。请观察这张图像（可能是画作、影视画面、动漫或万圣节角色、穿搭博主的照片或任何视觉素材），提取它的视觉语言，并把它"穿"成一套真实可穿的日常搭配。
+原则：不评价任何人的外貌；不使用"显瘦""显白""遮肉"等字眼；不说"必须"；语气像美术馆展签一样克制、准确、温柔。用简体中文。
+本机提取的主色（供参考，可修正）：${hint}
+只输出一个 JSON 对象，不要任何其他文字，格式：
+{"kind":"painting|film|cos|trend|upload 五选一：画作 painting，电影/剧集画面 film，动漫或节日角色/cosplay cos，真人穿搭照片 trend，其他 upload","title":"作品名（若是知名作品）或为这张图起的短标题",
+"decode":"若图中有人物穿搭则给出 {\"items\":[\"识别到的单品，3-6个\"],\"pattern\":\"一句话的搭配规律\",\"style\":\"风格名，英文\"}，否则为 null。先识别单品，再归纳规律，最后才命名风格。若 kind 为 cos：items 写角色的识别点，pattern 写"如何把它转译成日常单品"的规则，style 写日常版的名字；pieces 必须是日常可穿的单品，不是戏服。","artist":"作者，未知则空字符串","year":"年代，未知则空字符串",
+"palette":[{"hex":"#RRGGBB","name":"有画面感的中文色名，2-4字"}],
+"composition":"一句话：构图特点 → 如何转化为穿搭的比例或廓形",
+"texture":"一句话：笔触或质感 → 对应的面料",
+"mood":"2-3个词，用 · 分隔",
+"principle":"不超过10个字的视觉原则标签",
+"pieces":[{"slot":"outer","name":"含颜色的单品名","hex":"#RRGGBB","material":"面料"},{"slot":"top",...},{"slot":"bottom",...},{"slot":"shoes",...},{"slot":"accent",...}],
+"label":"像美术馆展签一样的2-3句话：图像中的视觉原则是什么，这套搭配如何运用它",
+"question":"一个开放式问题，帮助用户思考自己为什么被这张图吸引"}
+palette 给 5-6 个颜色，按面积从大到小。pieces 必须正好五个，slot 分别为 outer、top、bottom、shoes、accent。`;
+  try{const blob=await downscale(S.upload.img);let out;
+    if(typeof sampleFn.json==='function')out=await sampleFn.json(prompt,{images:[blob],modelTier:'default'});
+    else{const r=await sampleFn(prompt,{images:[blob],modelTier:'default'});out=JSON.parse(r.text.match(/\{[\s\S]*\}/)[0])}
+    S.result={...normalize(out,local),image:local.image,feel:local.feel};toast('AI 解读完成')}
+  catch(e){if(e&&e.code==='not_granted'){sampleFn=null;setPill();toast('未获授权，继续使用本机解读')}else if(e&&e.code==='rate_limited')toast('请求太频繁，稍后再试');else toast('AI 解读没有成功，已保留本机解读')}
+  finally{S.aiBusy=false;stay()}}
+
+document.addEventListener('submit',e=>{const f=e.target;
+  if(f.classList&&f.classList.contains('cform')&&f.dataset.pid){e.preventDefault();const i=f.querySelector('input');const t=i.value.trim();if(!t)return;const p=store.circle.posts.find(x=>x.id===f.dataset.pid);if(p){(p.comments=p.comments||[]).push({who:'me',t:t.slice(0,80)});save();stay()}return}
+  if(f.id==='chatform'){e.preventDefault();const t=$('#chatIn').value.trim();if(!t)return;store.circle.chat.push({who:'me',t:t.slice(0,120)});save();stay();const m=document.querySelector('.msgs');if(m)m.scrollTop=m.scrollHeight;return}if(e.target.id==='sceneform'){e.preventDefault();const v=$('#sceneIn').value;customScene(v)}});
+document.addEventListener('click',e=>{
+  if(e.target.id==='mc'&&S.under){sampleSkin(e);return}
+  if(e.target.id==='fitc'&&S.fit.mode){fitTap(e);return}
+  const el=e.target.closest('[data-a]');if(!el||el.disabled)return;const a=el.dataset.a,v=el.dataset.v;
+  const A={
+  tab(){S.tab=el.dataset.t;go()},
+  openArt(){const p=PRESETS.find(x=>x.id===el.dataset.id);S.result={...p,source:'preset',feel:store.feels[p.title]||null};S.upload=null;S.tab='art';go()},
+  pickArt(){$('#fileArt').click()},
+  backArt(){S.result=null;go()},
+  kind(){S.kind=v;stay()},
+  scene(){S.scene=v;stay();const c=document.querySelector('.carousel');if(c)c.scrollLeft=0},
+  addScene(){const i=$('#sceneIn');if(i){i.scrollIntoView({block:'center',behavior:'smooth'});i.focus()}},
+  weather(){S.wx=(S.wx+1)%WX.length;stay()},
+  wear(){const lk=sceneLooks()[+v];const ad=adapt(lk,WX[S.wx].k);ad.pieces.forEach(p=>{store.worn[p.name]=(store.worn[p.name]||0)+1});const k=dk(new Date());const old=store.diary[k]||{};store.diary[k]={type:'look',look:{title:lk.t,pieces:ad.pieces},story:old.story||'',scene:(SCENES[S.scene]||{}).zh||'',wx:WX[S.wx].t};save();toast('已记入今天的穿搭日志');stay()},
+  dday(){if(el.classList.contains('future'))return;const e=store.diary[v];S.diaryOpen=v;S.draft=e?JSON.parse(JSON.stringify(e)):{type:null,story:''};S.pickLook=false;stay()},
+  dclose(){S.diaryOpen=null;S.draft=null;stay()},
+  dmonth(){const m=S.calM;S.calM=new Date(m.getFullYear(),m.getMonth()+(+v),1);stay()},
+  dphoto(){$('#fileDiary').click()},
+  dpicklook(){const t=$('#storyIn');if(t)S.draft.story=t.value;S.pickLook=!S.pickLook;stay()},
+  dchoose(){const o=fitOptions().find(x=>x.id===v);if(!o)return;const t=$('#storyIn');if(t)S.draft.story=t.value;S.draft.type='look';S.draft.src=null;S.draft.look={title:o.label,pieces:o.pieces};S.pickLook=false;stay()},
+  dsave(){const d=S.draft;const t=$('#storyIn');if(t)d.story=t.value.slice(0,200);if(!d.type&&!d.story){toast('先选一张照片或一套搭配吧');return}const sh=$('#shareIn');d.share=!!(sh&&sh.checked);delete d.demo;store.diary[S.diaryOpen]=d;if(d.share){const id='me-'+S.diaryOpen;store.circle.posts=store.circle.posts.filter(p=>p.id!==id);store.circle.posts.push({id,who:'me',date:S.diaryOpen,look:d.look,src:d.src,story:(d.story||'')+((d.tags||[]).length?' '+d.tags.map(t=>'@'+FR(t).n).join(' '):''),tags:d.tags||[],react:null,comments:[]})}if(!savePhotos())return;S.diaryOpen=null;S.draft=null;toast('已保存到穿搭日志');stay()},
+  ddel(){delete store.diary[S.diaryOpen];save();S.diaryOpen=null;S.draft=null;toast('已删除这一天的记录');stay()},
+  feel(){S.result.feel=v;store.feels[S.result.title]=v;save();stay()},
+  saveLook(){const r=S.result;const k=dk(new Date());const old=store.diary[k]||{};store.looks=store.looks.filter(l=>l.title!==r.title);store.looks.push({title:r.title,palette:r.palette.slice(0,6).map(c=>c.hex),principle:r.principle,feel:r.feel,date:Date.now()});store.diary[k]={type:'look',look:{title:'灵感 · '+r.title,pieces:r.pieces},story:old.story||'',scene:'灵感'};save();toast('已记进今天的穿搭日志')},
+  toDrape(){S.fit.src='muse';S.fit.adj={};S.fit.over={};S.fit.sel=null;if(!S.fit.photo)S.fit.base=null;S.dset='art';S.didx=0;S.tab='drape';go()},
+  fitsrc(){const F=S.fit;F.src=v;F.adj={};F.over={};F.sel=null;if(!F.photo)F.base=null;stay()},
+  cmp(){S.fit.compare=!S.fit.compare;stay()},
+  pickBody(){$('#fileBody').click()},
+  fmark(){S.fit.mode=v||null;stay()},
+  fclear(){const F=S.fit;if(F.lab)F.lab.fill(0);F.mode=null;stay()},
+  wbreset(){const F=S.fit;F.wb=[1,1,1];F.temp=F.tint=F.bright=0;stay()},
+  fsel(){S.fit.sel=v;stay()},
+  fbody(){S.fit.body=v;if(!S.fit.photo)S.fit.base=null;stay()},
+  fover(){const F=S.fit;F.over[F.sel]=v;if(F.adj[F.sel])F.adj[F.sel]={l:0,w:0,s:0};stay()},
+  fresetover(){S.fit.over={};stay()},
+  fitAI(){fitAI()},
+  fitfeel(){const cur=fitCur();store.feels['fit:'+cur.label]=v;cur.pieces.forEach(p=>{const hex=adjHex(p.hex,S.fit.adj[p.slot]);store.picks=store.picks.filter(x=>!(x.hex===hex&&x.set==='art'));store.picks.push({hex,set:'art',liked:v==='yes'})});save();toast(v==='yes'?'记下了：这些颜色进入了你的色彩档案':'记下了，换一套试试');stay()},
+  fitsave(){const cur=fitCur();const ps=cur.pieces.map(p=>({...p,hex:adjHex(p.hex,S.fit.adj[p.slot])}));const k=dk(new Date());const old=store.diary[k]||{};store.looks=store.looks.filter(l=>l.title!==cur.label);store.looks.push({title:cur.label,palette:ps.map(p=>p.hex),principle:'试衣镜',feel:store.feels['fit:'+cur.label]||null,date:Date.now()});store.diary[k]={type:'look',look:{title:cur.label,pieces:ps},story:old.story||'',scene:'试衣镜'};save();toast('已记进今天的穿搭日志')},
+  addw(){addWatch(+v);stay()},
+  aiRead(){aiRead()},
+  dset(){S.dset=v;if(SUBS[v])S.dsub='true';S.didx=0;stay()},
+  dsub(){S.dsub=v;S.didx=0;stay()},
+  dprev(){const n=drapeColors().length||1;S.didx=(S.didx-1+n)%n;stay()},
+  dnext(){const n=drapeColors().length||1;S.didx=(S.didx+1)%n;stay()},
+  didx(){S.didx=+v;stay()},
+  dpick(){const cols=drapeColors();if(!cols.length)return;const hex=cols[S.didx][0];const cs=curSet();let p=store.picks.find(x=>x.hex===hex&&x.set===cs);if(!p){p={hex,set:cs};store.picks.push(p)}p.liked=v==='1';save();S.didx=(S.didx+1)%cols.length;stay()},
+  pickPhoto(){$('#filePhoto').click()},
+  under(){S.under=!S.under;stay()},
+  seg(){S.seg=v;go()},
+  market(){S.market=v;stay()},
+  tgt(){const w=store.watch.find(x=>x.id===el.dataset.id);if(!w)return;const step=Math.max(10,Math.round(w.hist.at(-1)*.05/10)*10);w.target=Math.max(10,w.target+(+v)*step);save();stay()},
+  waddphoto(){S.photoTarget=null;$('#fileGarment').click()},
+  wphoto(){S.photoTarget=v;$('#fileGarment').click()},
+  waddslot(){S.addPending.slot=v;const nm=$('#waddname');if(nm)S.addPending.name=nm.value;if(!S.addPending.touched)S.addPending.name=nameColor(S.addPending.hex)+GARM[v][0];stay()},
+  waddcancel(){S.addPending=null;stay()},
+  waddok(){const a=S.addPending;const nm=(($('#waddname')||{}).value||a.name).trim().slice(0,12)||a.name;let name=nm;let k=2;while(WARDROBE.some(w=>w.name===name))name=nm+k++;
+    const it={name,hex:a.hex,slot:a.slot,mat:a.slot==='shoes'?'皮':'棉',price:BASE[a.slot]||500,wears:1,last:0};WARDROBE.push(it);store.custom.push(it);store.photos[name]={src:a.src,hex:a.hex};S.addPending=null;savePhotos();toast('已加入衣橱：'+name);stay()},
+  cooldef(){store.coolDefault=+v;save();stay()},
+  coolset(){const w=store.watch.find(x=>x.id===el.dataset.id);if(!w)return;w.cool=+v;w.ended=false;save();stay()},
+  coolask(){S.confirmEnd=el.dataset.id;stay()},
+  coolkeep(){S.confirmEnd=null;stay()},
+  coolend(){const w=store.watch.find(x=>x.id===el.dataset.id);if(!w)return;w.ended=true;S.confirmEnd=null;save();toast('冷静期已结束，买不买都由你决定');stay()},
+  dtag(){const t=$('#storyIn');if(t)S.draft.story=t.value;const sh=$('#shareIn');if(sh)S.draft.share=sh.checked;const a=S.draft.tags=S.draft.tags||[];const i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);stay()},
+  invite(){S.invite=!S.invite;stay()},
+  copyinv(){const u=location.href.split('#')[0]+'#invite-violet';navigator.clipboard.writeText(u).then(()=>toast('邀请链接已复制')).catch(()=>toast('复制失败，请手动复制'))},
+  preact(){const p=store.circle.posts.find(x=>x.id===el.dataset.id);if(!p)return;p.react=p.react===v?null:v;save();stay()},
+  chatlook(){const lk=sceneLooks()[0];const ad=adapt(lk,WX[S.wx].k);store.circle.chat.push({who:'me',look:{title:lk.t,pieces:ad.pieces},t:''});save();stay();const m=document.querySelector('.msgs');if(m)m.scrollTop=m.scrollHeight},
+  rmw(){store.watch=store.watch.filter(x=>x.id!==el.dataset.id);save();stay()}};
+  A[a]&&A[a]()});
+$('#fileArt').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{const img=await loadImg(f);const ex=extractPalette(img);S.upload={img};S.result={...localAnalyze(ex),kind:'upload',image:img.src};S.tab='art';go();if(sampleFn)toast('色彩已提取 · 可以让 AI 深度解读')}catch(err){toast('这张图片无法读取')}});
+$('#filePhoto').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{S.photo=await loadImg(f);S.underRes=null;stay()}catch(err){toast('这张照片无法读取')}});
+$('#fileDiary').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f||!S.draft)return;try{const img=await loadImg(f);const M=420,sc=Math.min(1,M/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*sc);c.height=Math.round(img.naturalHeight*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);const t=$('#storyIn');if(t)S.draft.story=t.value;S.draft.type='photo';S.draft.src=c.toDataURL('image/jpeg',.8);S.draft.look=null;stay()}catch(err){toast('这张照片无法读取')}});
+$('#fileGarment').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;toast('正在抠图、识别颜色…');
+  try{const r=await processGarment(f);if(S.photoTarget){const w=WARDROBE.find(x=>x.name===S.photoTarget);if(w){store.photos[w.name]={src:r.src,hex:r.hex};w.hex=r.hex;savePhotos();toast(r.cut?'已换成实拍，颜色已更新':'已换成实拍（背景较复杂，未抠图）')}S.photoTarget=null}
+    else{S.addPending={src:r.src,hex:r.hex,slot:'top',name:nameColor(r.hex)+GARM.top[0]}}S.tab='closet';S.seg='closet';stay()}catch(err){toast('这张照片无法读取')}});
+$('#fileBody').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const F=S.fit;F.photo=await loadImg(f);F.base=null;F.lab=null;F.mode=null;F.compare=false;stay();toast(sampleFn?'上传好了：点「AI 自动识别衣服」或手动标记':'上传好了：点「上衣」「下装」，再点照片里对应的衣服')}catch(err){toast('这张照片无法读取')}});
+document.addEventListener('input',e=>{const el=e.target;if(!el.dataset||!el.dataset.k)return;const F=S.fit,k=el.dataset.k,v=+el.value;
+  if(el.dataset.g==='adj'){const a=F.adj[F.sel]=F.adj[F.sel]||{l:0,w:0,s:0};a[k]=v;const p=fitCur().pieces.find(p=>p.slot===F.sel);const h=adjHex(p.hex,a);const hx=$('#adjhex');if(hx)hx.textContent=h.toUpperCase();const ch=document.querySelector('.pchips button.on i');if(ch)ch.style.background=h}
+  else if(k==='tol'){F.tol=v;return}else{F[k]=v;if(k==='depth'&&!F.photo)F.base=null}drawFit()});
+document.addEventListener('change',e=>{if(e.target.id==='subSel'){S.fit.sub=e.target.value;S.fit.over={};if(!S.fit.photo)S.fit.base=null;stay()}});
+function setPill(){const p=$('#aiPill');p.textContent=sampleFn?'✦ AI 已连接':'本机模式';p.classList.toggle('on',!!sampleFn)}
+(async()=>{try{if(!window.claude||typeof window.claude.use!=='function')return;const s=await window.claude.use('sample');if(!s)return;let ok=false;try{const lim=await s.limits();ok=!!(lim&&lim.images)}catch(e){ok=false}if(ok){sampleFn=s;setPill();if(S.tab==='art')stay()}}catch(e){}})();
+render();
+</script>
+</body>
+</html>
